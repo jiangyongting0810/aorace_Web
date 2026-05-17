@@ -19,12 +19,14 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
 }
 
 body {
   margin: 0;
   color: var(--ink);
   background: var(--white);
+  overflow-x: clip;
 }
 
 button,
@@ -94,7 +96,68 @@ img {
 
 .mobile-menu {
   display: none;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  color: inherit;
+  background: transparent;
   font-size: 24px;
+}
+
+.mobile-nav-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 98;
+  display: none;
+  background: rgba(0, 0, 0, 0.42);
+}
+
+.mobile-nav-overlay.open {
+  display: block;
+}
+
+.mobile-nav {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 99;
+  width: min(320px, 86vw);
+  padding: 24px;
+  background: var(--white);
+  box-shadow: var(--shadow);
+  transform: translateX(-105%);
+  transition: transform 220ms ease;
+}
+
+.mobile-nav.open {
+  transform: translateX(0);
+}
+
+.mobile-nav-close {
+  float: right;
+  border: 0;
+  background: transparent;
+  text-decoration: underline;
+}
+
+.mobile-nav-logo {
+  width: 188px;
+  margin: 42px 0 34px;
+  filter: invert(1);
+}
+
+.mobile-nav nav {
+  display: grid;
+  gap: 4px;
+}
+
+.mobile-nav a {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 800;
 }
 
 .brand {
@@ -120,7 +183,16 @@ img {
   justify-content: center;
   gap: clamp(14px, 2.2vw, 32px);
   color: var(--white);
+  font-family: "Nunito Sans", "Arial Rounded MT Bold", "Aptos", Arial, Helvetica, sans-serif;
   font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.main-nav a {
+  font: inherit;
+  line-height: 1;
+  text-rendering: geometricPrecision;
 }
 
 .site-header.is-pinned .main-nav {
@@ -153,9 +225,9 @@ img {
 
 .lang-button {
   position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  place-items: center;
   gap: 0;
   width: 92px;
   min-height: 34px;
@@ -187,7 +259,7 @@ img {
   transition: transform 180ms ease;
 }
 
-.lang-button.show-en .lang-track {
+.lang-button.show-zh .lang-track {
   transform: translateX(100%);
 }
 
@@ -195,8 +267,7 @@ img {
   position: relative;
   z-index: 1;
   display: grid;
-  place-items: center;
-  width: 50%;
+  width: 100%;
   min-height: 28px;
   color: rgba(255, 255, 255, 0.72);
   transition: color 180ms ease;
@@ -206,8 +277,8 @@ img {
   color: var(--muted);
 }
 
-.lang-button.show-zh .lang-label.zh,
 .lang-button.show-en .lang-label.en,
+.lang-button.show-zh .lang-label.zh,
 .site-header.is-pinned .lang-button.show-zh .lang-label.zh,
 .site-header.is-pinned .lang-button.show-en .lang-label.en {
   color: var(--ink);
@@ -616,20 +687,15 @@ img {
 }
 
 .about-band {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.72fr);
-  gap: clamp(28px, 6vw, 72px);
+  display: flex;
   align-items: center;
-  width: 100vw;
-  margin: clamp(10px, 2vw, 24px) calc(50% - 50vw);
+  width: calc(100% + (100vw - var(--content-width)));
+  min-height: 520px;
+  margin: clamp(10px, 2vw, 24px) calc((var(--content-width) - 100vw) / 2);
   padding: clamp(58px, 7vw, 96px) max(18px, calc((100vw - var(--content-width)) / 2));
-  background: var(--soft);
-}
-
-.about-band img {
-  width: 100%;
-  min-height: 440px;
-  object-fit: cover;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.56) 0%, rgba(0, 0, 0, 0.34) 34%, rgba(0, 0, 0, 0.08) 72%),
+    url("./assets/about-us-pc.webp") center center / cover no-repeat;
 }
 
 .kicker {
@@ -642,9 +708,18 @@ img {
 
 .about-band p:not(.kicker) {
   margin: 20px 0 28px;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.82);
   font-size: 16px;
   line-height: 1.8;
+}
+
+.about-copy {
+  width: min(420px, 42vw);
+  color: var(--white);
+}
+
+.about-copy .kicker {
+  color: rgba(255, 255, 255, 0.74);
 }
 
 .blog-grid,
@@ -1147,56 +1222,116 @@ img {
   }
 
   .promo-grid,
-  .about-band,
   .checkout-grid,
   .footer {
     grid-template-columns: 1fr;
   }
-
-  .about-band img {
-    min-height: 340px;
-  }
 }
 
 @media (max-width: 720px) {
+  :root {
+    --content-width: calc(100% - 32px);
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+
   .announcement {
     min-height: 34px;
     font-size: 12px;
   }
 
   .site-header {
+    width: var(--content-width);
     min-height: 68px;
-    gap: 12px;
     top: 34px;
   }
 
-  .brand span:last-child {
-    display: none;
+  .site-header.is-pinned {
+    width: 100%;
+    padding: 0 16px;
+  }
+
+  .site-header-inner {
+    grid-template-columns: 40px minmax(116px, 1fr) auto;
+    gap: 8px;
+  }
+
+  .mobile-menu {
+    display: grid;
+    place-items: center;
+    padding: 0;
   }
 
   .brand {
-    min-width: 168px;
+    justify-self: start;
+    min-width: 0;
+    max-width: 150px;
   }
 
   .brand-logo {
-    width: 168px;
+    width: 150px;
     max-height: none;
   }
 
   .header-actions {
     gap: 6px;
+    min-width: 0;
+  }
+
+  .lang-button {
+    width: 78px;
+    min-height: 32px;
+    font-size: 11px;
+  }
+
+  .plain-icon,
+  .account-link {
+    display: none;
   }
 
   .cart-link {
-    font-size: 13px;
+    min-height: 34px;
+    padding: 0 8px;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.14) !important;
+    font-size: 12px;
   }
 
   .hero > img {
-    object-position: 38% center;
+    object-fit: cover;
+    object-position: 68% center;
   }
 
   .hero {
-    height: 910px;
+    height: clamp(610px, 156vw, 760px);
+    min-height: 0;
+    background: #0f1110;
+  }
+
+  .section {
+    padding-top: 38px;
+    padding-bottom: 42px;
+  }
+
+  .categories h2,
+  .section-title-row h2,
+  .about-band h2 {
+    font-size: 30px;
+  }
+
+  .categories h2 {
+    margin-bottom: 18px;
+  }
+
+  .category-image,
+  .category-image > img {
+    min-height: 252px;
+  }
+
+  .category-card h3 {
+    font-size: 24px;
   }
 
   .category-grid,
@@ -1208,6 +1343,36 @@ img {
     grid-template-columns: 1fr;
   }
 
+  .product-image {
+    aspect-ratio: 1.35 / 1;
+  }
+
+  .product-image img {
+    padding: 0;
+  }
+
+  .product-info {
+    padding: 0 18px 18px;
+  }
+
+  .product-title {
+    min-height: 0;
+    font-size: 14px;
+  }
+
+  .price-line {
+    font-size: 13px;
+  }
+
+  .quick-add-button {
+    min-height: 38px;
+    margin-top: 10px;
+  }
+
+  .product-slider-controls {
+    display: none;
+  }
+
   .promo-card,
   .promo-card img {
     min-height: 360px;
@@ -1215,6 +1380,62 @@ img {
 
   .section-title-row {
     align-items: start;
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+
+  .about-band {
+    min-height: 520px;
+    align-items: end;
+    padding-top: 42px;
+    padding-bottom: 46px;
+    background:
+      linear-gradient(180deg, rgba(0, 0, 0, 0.14) 0%, rgba(0, 0, 0, 0.62) 100%),
+      url("./assets/about-us-pc.webp") 58% center / cover no-repeat;
+  }
+
+  .about-band p:not(.kicker) {
+    margin: 14px 0 22px;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .about-copy {
+    width: min(100%, 360px);
+  }
+
+  .blog-card a {
+    font-size: 18px;
+  }
+
+  .review-card {
+    min-height: auto;
+    padding: 22px;
+  }
+
+  .service-bar div {
+    min-height: 76px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .drawer {
+    width: 100vw;
+    padding: 20px;
+  }
+
+  .drawer h2 {
+    margin-top: 58px;
+    font-size: 26px;
+  }
+
+  .cart-item {
+    grid-template-columns: 72px 1fr;
+  }
+
+  .cart-item img {
+    width: 72px;
+    height: 72px;
   }
 
   .checkout-modal {
@@ -1224,14 +1445,55 @@ img {
   .checkout-panel {
     min-height: 100vh;
     max-height: 100vh;
+    padding: 20px 16px 34px;
   }
 
   .checkout-row {
     grid-template-columns: 1fr;
   }
 
-  .service-bar div {
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
+  .checkout-fields h2 {
+    margin-top: 40px;
+    font-size: 28px;
+  }
+
+  .checkout-summary {
+    padding: 18px;
+  }
+
+  .search-modal {
+    padding-top: 82px;
+    align-items: start;
+  }
+
+  .search-modal > div {
+    width: calc(100% - 32px);
+    padding: 20px;
+  }
+
+  .search-modal input {
+    min-height: 50px;
+    font-size: 16px;
+  }
+
+  .cookie-panel {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    width: auto;
+    padding: 16px;
+  }
+
+  .cookie-panel p {
+    font-size: 13px;
+  }
+
+  .cookie-panel button {
+    min-height: 38px;
+    padding: 0 14px;
+  }
+
+  .footer {
+    padding: 42px 16px;
   }
 }

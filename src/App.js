@@ -141,12 +141,12 @@ const categories = [
   {
     en: "Fishing Reels",
     zh: "\u6e14\u8f6e",
-    image: "https://images.unsplash.com/photo-1519678572660-9972c7886d4b?auto=format&fit=crop&w=900&q=80",
+    image: "./src/assets/category-reels.webp",
   },
   {
     en: "Fishing Rods",
     zh: "\u9c7c\u7aff",
-    image: "https://images.unsplash.com/photo-1500463959177-e0869687df26?auto=format&fit=crop&w=900&q=80",
+    image: "./src/assets/category-rods.jpg",
   },
   {
     en: "Fishing Lures",
@@ -171,7 +171,7 @@ const products = [
     rating: "4.9",
     reviews: "279",
     options: ["Silver / 2000", "Silver / 3000", "Silver / 4000"],
-    image: "https://images.unsplash.com/photo-1519678572660-9972c7886d4b?auto=format&fit=crop&w=900&q=80",
+    image: "./src/assets/best-reel.png",
   },
   {
     id: "m1-elite-spinning-reel",
@@ -183,7 +183,7 @@ const products = [
     rating: "4.7",
     reviews: "13",
     options: ["Black / 2500", "Black / 3500", "Red / 3500"],
-    image: "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=900&q=80",
+    image: "./src/assets/best-reel.png",
   },
   {
     id: "m1-travel-casting-rod",
@@ -195,7 +195,7 @@ const products = [
     rating: "4.7",
     reviews: "22",
     options: ["6'6\" / Medium", "7'0\" / Medium Heavy"],
-    image: "https://images.unsplash.com/photo-1500463959177-e0869687df26?auto=format&fit=crop&w=900&q=80",
+    image: "./src/assets/best-travel-rod.png",
   },
   {
     id: "m1-trout-casting-rod",
@@ -208,7 +208,7 @@ const products = [
     rating: "4.9",
     reviews: "9",
     options: ["5'6\" / Light", "6'0\" / Light", "6'6\" / Ultralight"],
-    image: "https://images.unsplash.com/photo-1455043849284-0b3f18cf6a24?auto=format&fit=crop&w=900&q=80",
+    image: "./src/assets/best-lures.png",
   },
 ];
 
@@ -216,17 +216,17 @@ const blogs = [
   {
     title: "4 Common Fishing Mistakes and How to Fix Them",
     zh: "4 \u4e2a\u5e38\u89c1\u9493\u9c7c\u9519\u8bef\u4ee5\u53ca\u4fee\u6b63\u65b9\u6cd5",
-    image: "https://images.unsplash.com/photo-1518110925495-5fe2fda0442c?auto=format&fit=crop&w=900&q=80",
+    image: "./src/assets/experience-stream.png",
   },
   {
     title: "Live Bait vs. Artificial Lures",
     zh: "\u6d3b\u9975\u548c\u4eba\u5de5\u62df\u9975\u600e\u4e48\u9009",
-    image: "https://images.unsplash.com/photo-1512757776214-26d36777b513?auto=format&fit=crop&w=900&q=80",
+    image: "./src/assets/experience-whitebait.png",
   },
   {
     title: "Spinning or Casting: Pick the Right Reel",
     zh: "\u7eba\u8f66\u8f6e\u8fd8\u662f\u6c34\u6ef4\u8f6e\uff1a\u5982\u4f55\u9009\u62e9",
-    image: "https://images.unsplash.com/photo-1518443855757-dfadac7101ae?auto=format&fit=crop&w=900&q=80",
+    image: "./src/assets/best-lures.png",
   },
 ];
 
@@ -242,6 +242,7 @@ function App() {
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [cookieVisible, setCookieVisible] = useState(true);
   const [orderResult, setOrderResult] = useState(null);
   const t = copy[lang];
@@ -250,7 +251,6 @@ function App() {
   const navItems = useMemo(() => t.nav, [t]);
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const cartSubtotal = cartItems.reduce((sum, item) => sum + item.amount * item.quantity, 0);
-
   const addToCart = (product, option = product.options[0]) => {
     setCartItems((items) => {
       const key = `${product.id}-${option}`;
@@ -299,12 +299,17 @@ function App() {
       setLang,
       setSearchOpen,
       setCartOpen,
+      mobileNavOpen,
+      setMobileNavOpen,
     }),
     React.createElement("main", null,
       React.createElement(Hero, { t }),
       React.createElement("div", { className: "content-container" },
-        React.createElement(CategorySection, { t, lang }),
-        React.createElement(ProductSection, { t, addToCart }),
+      React.createElement(CategorySection, { t, lang }),
+        React.createElement(ProductSection, {
+          t,
+          addToCart,
+        }),
         React.createElement(AboutSection, { t }),
         React.createElement(BlogSection, { t, lang }),
         React.createElement(Testimonials, { t }),
@@ -339,32 +344,51 @@ function App() {
   );
 }
 
-function Header({ t, navItems, cartCount, lang, otherLang, setLang, setSearchOpen, setCartOpen }) {
-  return React.createElement("header", { className: "site-header" },
-    React.createElement("div", { className: "site-header-inner" },
-      React.createElement("div", { className: "mobile-menu" }, "\u2630"),
-      React.createElement("a", { className: "brand", href: "#" },
-        React.createElement("img", { className: "brand-logo", src: "./src/assets/aorace.svg", alt: "Aorace" })
-      ),
-      React.createElement("nav", { className: "main-nav", "aria-label": "Main menu" },
-        navItems.map((item, index) =>
-          React.createElement("a", { href: "#", key: `${item}-${index}` }, item)
-        )
-      ),
-      React.createElement("div", { className: "header-actions" },
+function Header({ t, navItems, cartCount, lang, otherLang, setLang, setSearchOpen, setCartOpen, mobileNavOpen, setMobileNavOpen }) {
+  const navLinks = navItems.map((item, index) =>
+    React.createElement("a", {
+      href: index === 0 ? "#" : "#best-sellers",
+      key: `${item}-${index}`,
+      onClick: () => setMobileNavOpen(false),
+    }, item)
+  );
+
+  return React.createElement(React.Fragment, null,
+    React.createElement("header", { className: "site-header" },
+      React.createElement("div", { className: "site-header-inner" },
         React.createElement("button", {
-          className: lang === "en" ? "lang-button show-zh" : "lang-button show-en",
-          onClick: () => setLang(otherLang),
-          "aria-label": lang === "en" ? "\u5207\u6362\u5230\u4e2d\u6587" : "Switch to English",
-        },
-          React.createElement("span", { className: "lang-track", "aria-hidden": "true" }),
-          React.createElement("span", { className: "lang-label zh" }, "\u4e2d\u6587"),
-          React.createElement("span", { className: "lang-label en" }, "EN")
+          className: "mobile-menu",
+          onClick: () => setMobileNavOpen(true),
+          "aria-label": "Open menu",
+        }, "\u2630"),
+        React.createElement("a", { className: "brand", href: "#" },
+          React.createElement("img", { className: "brand-logo", src: "./src/assets/aorace.svg", alt: "Aorace" })
         ),
-        React.createElement("button", { className: "plain-icon", onClick: () => setSearchOpen(true), "aria-label": t.search }, "\u2315"),
-        React.createElement("button", { className: "account-link" }, t.account),
-        React.createElement("button", { className: "cart-link", onClick: () => setCartOpen(true) }, `${t.cart} ${cartCount}`)
+        React.createElement("nav", { className: "main-nav", "aria-label": "Main menu" }, navLinks),
+        React.createElement("div", { className: "header-actions" },
+        React.createElement("button", {
+            className: lang === "en" ? "lang-button show-en" : "lang-button show-zh",
+            onClick: () => setLang(otherLang),
+            "aria-label": lang === "en" ? "\u5207\u6362\u5230\u4e2d\u6587" : "Switch to English",
+          },
+            React.createElement("span", { className: "lang-track", "aria-hidden": "true" }),
+            React.createElement("span", { className: "lang-label en" }, "EN"),
+            React.createElement("span", { className: "lang-label zh" }, "\u4e2d\u6587")
+          ),
+          React.createElement("button", { className: "plain-icon", onClick: () => setSearchOpen(true), "aria-label": t.search }, "\u2315"),
+          React.createElement("button", { className: "account-link" }, t.account),
+          React.createElement("button", { className: "cart-link", onClick: () => setCartOpen(true) }, `${t.cart} ${cartCount}`)
+        )
       )
+    ),
+    React.createElement("div", {
+      className: mobileNavOpen ? "mobile-nav-overlay open" : "mobile-nav-overlay",
+      onClick: () => setMobileNavOpen(false),
+    }),
+    React.createElement("aside", { className: mobileNavOpen ? "mobile-nav open" : "mobile-nav" },
+      React.createElement("button", { className: "mobile-nav-close", onClick: () => setMobileNavOpen(false) }, t.close),
+      React.createElement("img", { className: "mobile-nav-logo", src: "./src/assets/aorace.svg", alt: "Aorace" }),
+      React.createElement("nav", { "aria-label": "Mobile menu" }, navLinks)
     )
   );
 }
@@ -474,11 +498,7 @@ function ProductSection({ t, addToCart }) {
 
 function AboutSection({ t }) {
   return React.createElement("section", { className: "about-band" },
-    React.createElement("img", {
-      src: "https://images.unsplash.com/photo-1518110925495-5fe2fda0442c?auto=format&fit=crop&w=1200&q=85",
-      alt: "Fishing gear official store",
-    }),
-    React.createElement("div", null,
+    React.createElement("div", { className: "about-copy" },
       React.createElement("p", { className: "kicker" }, t.aboutTitle),
       React.createElement("h2", null, t.aboutTitle),
       React.createElement("p", null, t.aboutBody),

@@ -15,6 +15,7 @@ const types = {
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
   ".svg": "image/svg+xml",
+  ".webp": "image/webp",
 };
 
 const server = http.createServer((req, res) => {
@@ -57,7 +58,8 @@ const server = http.createServer((req, res) => {
   if (pathname === "/") pathname = "/index.html";
 
   const file = path.normalize(path.join(root, pathname));
-  if (!file.startsWith(root)) {
+  const relativePath = path.relative(root, file);
+  if (relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
     res.writeHead(403);
     res.end("Forbidden");
     return;
