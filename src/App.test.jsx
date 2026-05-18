@@ -47,4 +47,17 @@ describe("FishWeb React app", () => {
     expect(screen.getByRole("heading", { name: "HANDING M1 Travel Casting Rod" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "+ Quick add" })).toBeInTheDocument();
   });
+
+  test("renders the fishing rods collection page and opens sorting options", async () => {
+    const user = userEvent.setup();
+    window.history.pushState({}, "", "/collections/fishing-rods");
+    render(<App />);
+
+    expect(screen.getByRole("heading", { name: "Fishing Rods" })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /Sort by:/i }));
+
+    expect(screen.getByRole("button", { name: "Best selling" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Price, high to low" })).toBeInTheDocument();
+  });
 });

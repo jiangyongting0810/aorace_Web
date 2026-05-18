@@ -15,7 +15,7 @@ function CategorySection({ t, lang }) {
       <h2>{t.categoriesTitle}</h2>
       <div className="category-grid">
         {categories.slice(0, 3).map((category) => (
-          <Link to="/#best-sellers" className="category-card" key={category.en}>
+          <Link to={category.en === "Fishing Rods" ? "/collections/fishing-rods" : "/#best-sellers"} className="category-card" key={category.en}>
             <div className="category-image">
               <img src={category.image} alt={category.en} />
               <div className="category-overlay">
@@ -35,7 +35,7 @@ function ProductSection({ t, addToCart }) {
     <section className="section products" id="best-sellers">
       <div className="section-title-row">
         <h2>{t.bestTitle}</h2>
-        <Link to="/#best-sellers" className="view-all-link">
+        <Link to="/collections/fishing-rods" className="view-all-link">
           <span>{t.viewAll}</span>
           <span aria-hidden="true">›</span>
         </Link>

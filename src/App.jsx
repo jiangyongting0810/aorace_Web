@@ -6,6 +6,7 @@ import { CookiePanel } from "./components/CookiePanel.jsx";
 import { Footer } from "./components/Footer.jsx";
 import { Header } from "./components/Header.jsx";
 import { SearchOverlay } from "./components/SearchOverlay.jsx";
+import { FishingRodsPage } from "./pages/FishingRodsPage.jsx";
 import { HomePage } from "./pages/HomePage.jsx";
 import { ProductDetailPage } from "./pages/ProductDetailPage.jsx";
 import { StoryDetailPage } from "./pages/StoryDetailPage.jsx";
@@ -18,7 +19,7 @@ function ScrollEffects() {
   useEffect(() => {
     const updateHeaderState = () => {
       const header = document.querySelector(".site-header");
-      const hero = document.querySelector(".hero");
+      const hero = document.querySelector(".hero, .rods-hero");
       if (!header || !hero) return;
       const threshold = hero.offsetTop + hero.offsetHeight / 2;
       header.classList.toggle("is-pinned", window.scrollY >= threshold);
@@ -65,16 +66,16 @@ function AppShell() {
     {
       key: "rods",
       label: t.nav[1],
-      href: "/#best-sellers",
+      href: "/collections/fishing-rods",
       megaMenu: {
         heading: t.megaMenu.allRods,
-        headingHref: "/#best-sellers",
+        headingHref: "/collections/fishing-rods",
         links: [
-          { key: "spinning", label: t.megaMenu.spinningRods, href: "/#best-sellers" },
-          { key: "casting", label: t.megaMenu.castingRods, href: "/#best-sellers" },
+          { key: "spinning", label: t.megaMenu.spinningRods, href: "/collections/fishing-rods" },
+          { key: "casting", label: t.megaMenu.castingRods, href: "/collections/fishing-rods" },
         ],
         feature: {
-          href: "/products/m1-travel-casting-rod",
+          href: "/collections/fishing-rods",
           alt: t.megaMenu.featuredAlt,
           eyebrow: t.megaMenu.featuredEyebrow,
           title: t.megaMenu.featuredTitle,
@@ -144,6 +145,7 @@ function AppShell() {
       />
       <Routes>
         <Route path="/" element={<HomePage t={t} lang={lang} addToCart={addToCart} />} />
+        <Route path="/collections/fishing-rods" element={<FishingRodsPage t={t} lang={lang} addToCart={addToCart} />} />
         <Route path="/products/:productId" element={<ProductDetailPage t={t} addToCart={addToCart} />} />
         <Route path="/stories/:slug" element={<StoryDetailPage t={t} lang={lang} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
