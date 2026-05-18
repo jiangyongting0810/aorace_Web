@@ -1,0 +1,190 @@
+import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import { assets } from "../data/content.js";
+
+function SmartLink({ href, className, onClick, children }) {
+  if (href?.startsWith("/")) {
+    return <Link to={href} className={className} onClick={onClick}>{children}</Link>;
+  }
+
+  return <a href={href || "#"} className={className} onClick={onClick}>{children}</a>;
+}
+
+function MegaMenuPanel({ menu, closeMegaMenu }) {
+  return (
+    <div className="mega-menu-panel">
+      <div className="mega-menu-copy">
+        <SmartLink href={menu.headingHref} className="mega-menu-heading" onClick={closeMegaMenu}>
+          {menu.heading}
+        </SmartLink>
+        <div className="mega-menu-links">
+          {menu.links.map((link) => (
+            <SmartLink href={link.href} className="mega-menu-link" key={link.key} onClick={closeMegaMenu}>
+              {link.label}
+            </SmartLink>
+          ))}
+        </div>
+      </div>
+      <SmartLink href={menu.feature.href} className="mega-menu-media" onClick={closeMegaMenu}>
+        <img src={assets.categoryRods} alt={menu.feature.alt} />
+        <div className="mega-menu-media-copy">
+          <span>{menu.feature.eyebrow}</span>
+          <strong>{menu.feature.title}</strong>
+        </div>
+      </SmartLink>
+    </div>
+  );
+}
+
+export function Header({
+  t,
+  navItems,
+  cartCount,
+  lang,
+  otherLang,
+  setLang,
+  setSearchOpen,
+  setCartOpen,
+  mobileNavOpen,
+  setMobileNavOpen,
+}) {
+  const [megaMenuOpen, setMegaMenuOpen] = useState(false);
+  const [mobileRodsOpen, setMobileRodsOpen] = useState(false);
+  const openTimer = useRef(null);
+  const closeTimer = useRef(null);
+  const hoverDelay = 180;
+
+  useEffect(() => () => {
+    window.clearTimeout(openTimer.current);
+    window.clearTimeout(closeTimer.current);
+  }, []);
+
+  const scheduleMegaMenuOpen = () => {
+    window.clearTimeout(closeTimer.current);
+    window.clearTimeout(openTimer.current);
+    openTimer.current = window.setTimeout(() => setMegaMenuOpen(true), hoverDelay);
+  };
+
+  const scheduleMegaMenuClose = () => {
+    window.clearTimeout(openTimer.current);
+    window.clearTimeout(closeTimer.current);
+    closeTimer.current = window.setTimeout(() => setMegaMenuOpen(false), hoverDelay);
+  };
+
+  const closeMegaMenuImmediately = () => {
+    window.clearTimeout(openTimer.current);
+    window.clearTimeout(closeTimer.current);
+    setMegaMenuOpen(false);
+  };
+
+  const closeMobileNav = () => {
+    setMobileNavOpen(false);
+    setMobileRodsOpen(false);
+  };
+
+  const openMobileNav = () => {
+    closeMegaMenuImmediately();
+    setMobileRodsOpen(false);
+    setMobileNavOpen(true);
+  };
+
+  return (
+    <>
+      <header className="site-header">
+        <div className="site-header-inner">
+          <button className="mobile-menu" onClick={openMobileNav} aria-label="Open menu">☰</button>
+          <Link className="brand" to="/" aria-label={t.brand}>
+            <img className="brand-logo" src={assets.aoraceLogo} alt="Aorace" />
+          </Link>
+          <nav className="main-nav" aria-label="Main menu">
+            {navItems.map((item) => item.megaMenu ? (
+              <div
+                className={megaMenuOpen ? "nav-item has-mega open" : "nav-item has-mega"}
+                key={item.key}
+                onMouseEnter={scheduleMegaMenuOpen}
+                onMouseLeave={scheduleMegaMenuClose}
+              >
+                <button
+                  type="button"
+                  className="nav-trigger"
+                  aria-expanded={megaMenuOpen}
+                  aria-haspopup="true"
+                >
+                  {item.label}
+                </button>
+                <MegaMenuPanel menu={item.megaMenu} closeMegaMenu={closeMegaMenuImmediately} />
+              </div>
+            ) : (
+              <div className="nav-item" key={item.key}>
+                <SmartLink href={item.href} className="nav-link">{item.label}</SmartLink>
+              </div>
+            ))}
+          </nav>
+          <div className="header-actions">
+            <button
+              className={lang === "en" ? "lang-button show-en" : "lang-button show-zh"}
+              onClick={() => setLang(otherLang)}
+              aria-label={lang === "en" ? "切换到中文" : "Switch to English"}
+            >
+              <span className="lang-track" aria-hidden="true" />
+              <span className="lang-label en">EN</span>
+              <span className="lang-label zh">中文</span>
+            </button>
+            <button className="plain-icon" onClick={() => setSearchOpen(true)} aria-label={t.search}>⌕</button>
+            <button className="account-link">{t.account}</button>
+            <button className="cart-link" onClick={() => setCartOpen(true)}>{`${t.cart} ${cartCount}`}</button>
+          </div>
+        </div>
+      </header>
+      <div
+        className={mobileNavOpen ? "mobile-nav-overlay open" : "mobile-nav-overlay"}
+        onClick={closeMobileNav}
+      />
+      <aside className={mobileNavOpen ? "mobile-nav open" : "mobile-nav"}>
+        <button className="mobile-nav-close" onClick={closeMobileNav}>{t.close}</button>
+        <img className="mobile-nav-logo" src={assets.aoraceLogo} alt="Aorace" />
+        <nav aria-label="Mobile menu">
+          {navItems.map((item) => item.megaMenu ? (
+            <div className="mobile-nav-item has-children" key={item.key}>
+              <button
+                type="button"
+                className={mobileRodsOpen ? "mobile-nav-toggle open" : "mobile-nav-toggle"}
+                aria-expanded={mobileRodsOpen}
+                onClick={() => setMobileRodsOpen((open) => !open)}
+              >
+                <span>{item.label}</span>
+                <span className="mobile-chevron" aria-hidden="true">⌄</span>
+              </button>
+              <div className={mobileRodsOpen ? "mobile-submenu open" : "mobile-submenu"}>
+                <div className="mobile-submenu-inner">
+                  <SmartLink href={item.megaMenu.headingHref} className="mobile-submenu-primary" onClick={closeMobileNav}>
+                    {item.megaMenu.heading}
+                  </SmartLink>
+                  {item.megaMenu.links.map((link) => (
+                    <SmartLink href={link.href} key={link.key} onClick={closeMobileNav}>
+                      {link.label}
+                    </SmartLink>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <SmartLink href={item.href} key={item.key} onClick={closeMobileNav}>
+              {item.label}
+            </SmartLink>
+          ))}
+          <button
+            type="button"
+            className="mobile-nav-search"
+            onClick={() => {
+              closeMobileNav();
+              setSearchOpen(true);
+            }}
+          >
+            {t.search}
+          </button>
+        </nav>
+      </aside>
+    </>
+  );
+}

@@ -1,8 +1,10 @@
-const http = require("http");
-const fs = require("fs");
-const path = require("path");
+import http from "node:http";
+import fs from "node:fs";
+import path from "node:path";
 
 const root = process.cwd();
+const distRoot = path.join(root, "dist");
+const staticRoot = fs.existsSync(path.join(distRoot, "index.html")) ? distRoot : root;
 const port = Number(process.env.PORT || 4173);
 const host = "127.0.0.1";
 const ordersFile = path.join(root, "orders.json");
@@ -57,8 +59,8 @@ const server = http.createServer((req, res) => {
   let pathname = decodeURIComponent(req.url.split("?")[0]);
   if (pathname === "/") pathname = "/index.html";
 
-  const file = path.normalize(path.join(root, pathname));
-  const relativePath = path.relative(root, file);
+  const file = path.normalize(path.join(staticRoot, pathname));
+  const relativePath = path.relative(staticRoot, file);
   if (relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
     res.writeHead(403);
     res.end("Forbidden");
@@ -67,6 +69,19 @@ const server = http.createServer((req, res) => {
 
   fs.readFile(file, (error, data) => {
     if (error) {
+      const fallback = path.join(staticRoot, "index.html");
+      if (staticRoot === distRoot && req.method === "GET") {
+        fs.readFile(fallback, (fallbackError, fallbackData) => {
+          if (fallbackError) {
+            res.writeHead(404, { "Content-Type": "text/plain;charset=utf-8" });
+            res.end("Not found");
+            return;
+          }
+          res.writeHead(200, { "Content-Type": types[".html"] });
+          res.end(fallbackData);
+        });
+        return;
+      }
       res.writeHead(404, { "Content-Type": "text/plain;charset=utf-8" });
       res.end("Not found");
       return;
