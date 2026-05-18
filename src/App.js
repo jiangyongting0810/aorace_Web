@@ -1,5 +1,8 @@
 const { useMemo, useState } = React;
 
+let megaMenuOpenTimer = null;
+let megaMenuCloseTimer = null;
+
 const copy = {
   en: {
     top: "Free Shipping on Orders Over $50",
@@ -8,6 +11,14 @@ const copy = {
     search: "Search",
     account: "Account",
     cart: "Cart",
+    megaMenu: {
+      allRods: "All Fishing Rods",
+      spinningRods: "Spinning Rods",
+      castingRods: "Casting Rods",
+      featuredEyebrow: "Featured pick",
+      featuredTitle: "Travel-ready casting rod",
+      featuredAlt: "Featured TideForge fishing rod",
+    },
     heroTitle: "TideForge Fishing Tackle",
     heroSubtitle: "Reliable rods, reels and lures built for everyday anglers.",
     heroCta: "Shop Bestseller",
@@ -75,6 +86,14 @@ const copy = {
     search: "\u641c\u7d22",
     account: "\u8d26\u6237",
     cart: "\u8d2d\u7269\u8f66",
+    megaMenu: {
+      allRods: "\u5168\u90e8\u9c7c\u7aff",
+      spinningRods: "\u7eba\u8f66\u7aff",
+      castingRods: "\u67aa\u67c4\u7aff",
+      featuredEyebrow: "\u672c\u5468\u63a8\u8350",
+      featuredTitle: "\u8f7b\u88c5\u8fdc\u884c\u67aa\u67c4\u7aff",
+      featuredAlt: "TideForge \u63a8\u8350\u9c7c\u7aff",
+    },
     heroTitle: "TideForge \u6e14\u5177",
     heroSubtitle: "\u4e3a\u65e5\u5e38\u9493\u624b\u6253\u9020\u7684\u9ad8\u6027\u4ef7\u6bd4\u9c7c\u7aff\u3001\u6e14\u8f6e\u548c\u62df\u9975\u3002",
     heroCta: "\u9009\u8d2d\u70ed\u5356",
@@ -248,7 +267,33 @@ function App() {
   const t = copy[lang];
   const otherLang = lang === "en" ? "zh" : "en";
 
-  const navItems = useMemo(() => t.nav, [t]);
+  const navItems = useMemo(() => [
+    { key: "home", label: t.nav[0], href: "#" },
+    {
+      key: "rods",
+      label: t.nav[1],
+      megaMenu: {
+        heading: t.megaMenu.allRods,
+        headingHref: "#best-sellers",
+        links: [
+          { key: "spinning", label: t.megaMenu.spinningRods, href: "#best-sellers" },
+          { key: "casting", label: t.megaMenu.castingRods, href: "#best-sellers" },
+        ],
+        feature: {
+          href: "#best-sellers",
+          image: "./src/assets/category-rods.jpg",
+          alt: t.megaMenu.featuredAlt,
+          eyebrow: t.megaMenu.featuredEyebrow,
+          title: t.megaMenu.featuredTitle,
+        },
+      },
+    },
+    { key: "reels", label: t.nav[2], href: "#best-sellers" },
+    { key: "lures", label: t.nav[3], href: "#best-sellers" },
+    { key: "sale", label: t.nav[4], href: "#best-sellers" },
+    { key: "about", label: t.nav[5], href: "#" },
+    { key: "support", label: t.nav[6], href: "#" },
+  ], [t]);
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const cartSubtotal = cartItems.reduce((sum, item) => sum + item.amount * item.quantity, 0);
   const addToCart = (product, option = product.options[0]) => {
@@ -345,26 +390,133 @@ function App() {
 }
 
 function Header({ t, navItems, cartCount, lang, otherLang, setLang, setSearchOpen, setCartOpen, mobileNavOpen, setMobileNavOpen }) {
-  const navLinks = navItems.map((item, index) =>
-    React.createElement("a", {
-      href: index === 0 ? "#" : "#best-sellers",
-      key: `${item}-${index}`,
-      onClick: () => setMobileNavOpen(false),
-    }, item)
-  );
+  const [megaMenuOpen, setMegaMenuOpen] = useState(false);
+  const [mobileRodsOpen, setMobileRodsOpen] = useState(false);
+  const hoverDelay = 180;
+
+  const clearTimer = (type) => {
+    if (type === "open" && megaMenuOpenTimer) {
+      clearTimeout(megaMenuOpenTimer);
+      megaMenuOpenTimer = null;
+      return;
+    }
+    if (type === "close" && megaMenuCloseTimer) {
+      clearTimeout(megaMenuCloseTimer);
+      megaMenuCloseTimer = null;
+    }
+  };
+
+  const scheduleMegaMenuOpen = () => {
+    clearTimer("close");
+    clearTimer("open");
+    megaMenuOpenTimer = setTimeout(() => {
+      setMegaMenuOpen(true);
+      megaMenuOpenTimer = null;
+    }, hoverDelay);
+  };
+
+  const scheduleMegaMenuClose = () => {
+    clearTimer("open");
+    clearTimer("close");
+    megaMenuCloseTimer = setTimeout(() => {
+      setMegaMenuOpen(false);
+      megaMenuCloseTimer = null;
+    }, hoverDelay);
+  };
+
+  const closeMegaMenuImmediately = () => {
+    clearTimer("open");
+    clearTimer("close");
+    setMegaMenuOpen(false);
+  };
+
+  const closeMobileNav = () => {
+    setMobileNavOpen(false);
+    setMobileRodsOpen(false);
+  };
+
+  const openMobileNav = () => {
+    closeMegaMenuImmediately();
+    setMobileRodsOpen(false);
+    setMobileNavOpen(true);
+  };
+
+  const desktopNavLinks = navItems.map((item) => {
+    if (item.megaMenu) {
+      return React.createElement("div", {
+        className: megaMenuOpen ? "nav-item has-mega open" : "nav-item has-mega",
+        key: item.key,
+        onMouseEnter: scheduleMegaMenuOpen,
+        onMouseLeave: scheduleMegaMenuClose,
+      },
+        React.createElement("button", {
+          type: "button",
+          className: "nav-trigger",
+          "aria-expanded": megaMenuOpen,
+          "aria-haspopup": "true",
+        }, item.label),
+        React.createElement(MegaMenuPanel, {
+          menu: item.megaMenu,
+          closeMegaMenu: closeMegaMenuImmediately,
+        })
+      );
+    }
+
+    return React.createElement("div", { className: "nav-item", key: item.key },
+      React.createElement("a", { href: item.href, className: "nav-link" }, item.label)
+    );
+  });
+
+  const mobileNavLinks = navItems.map((item) => {
+    if (item.megaMenu) {
+      return React.createElement("div", { className: "mobile-nav-item has-children", key: item.key },
+        React.createElement("button", {
+          type: "button",
+          className: mobileRodsOpen ? "mobile-nav-toggle open" : "mobile-nav-toggle",
+          "aria-expanded": mobileRodsOpen,
+          onClick: () => setMobileRodsOpen((open) => !open),
+        },
+          React.createElement("span", null, item.label),
+          React.createElement("span", { className: "mobile-chevron", "aria-hidden": "true" }, "\u2304")
+        ),
+        React.createElement("div", { className: mobileRodsOpen ? "mobile-submenu open" : "mobile-submenu" },
+          React.createElement("div", { className: "mobile-submenu-inner" },
+            React.createElement("a", {
+              href: item.megaMenu.headingHref,
+              className: "mobile-submenu-primary",
+              onClick: closeMobileNav,
+            }, item.megaMenu.heading),
+            item.megaMenu.links.map((link) =>
+              React.createElement("a", {
+                href: link.href,
+                key: link.key,
+                onClick: closeMobileNav,
+              }, link.label)
+            )
+          )
+        )
+      );
+    }
+
+    return React.createElement("a", {
+      href: item.href,
+      key: item.key,
+      onClick: closeMobileNav,
+    }, item.label);
+  });
 
   return React.createElement(React.Fragment, null,
     React.createElement("header", { className: "site-header" },
       React.createElement("div", { className: "site-header-inner" },
         React.createElement("button", {
           className: "mobile-menu",
-          onClick: () => setMobileNavOpen(true),
+          onClick: openMobileNav,
           "aria-label": "Open menu",
         }, "\u2630"),
         React.createElement("a", { className: "brand", href: "#" },
           React.createElement("img", { className: "brand-logo", src: "./src/assets/aorace.svg", alt: "Aorace" })
         ),
-        React.createElement("nav", { className: "main-nav", "aria-label": "Main menu" }, navLinks),
+        React.createElement("nav", { className: "main-nav", "aria-label": "Main menu" }, desktopNavLinks),
         React.createElement("div", { className: "header-actions" },
         React.createElement("button", {
             className: lang === "en" ? "lang-button show-en" : "lang-button show-zh",
@@ -383,12 +535,48 @@ function Header({ t, navItems, cartCount, lang, otherLang, setLang, setSearchOpe
     ),
     React.createElement("div", {
       className: mobileNavOpen ? "mobile-nav-overlay open" : "mobile-nav-overlay",
-      onClick: () => setMobileNavOpen(false),
+      onClick: closeMobileNav,
     }),
     React.createElement("aside", { className: mobileNavOpen ? "mobile-nav open" : "mobile-nav" },
-      React.createElement("button", { className: "mobile-nav-close", onClick: () => setMobileNavOpen(false) }, t.close),
+      React.createElement("button", { className: "mobile-nav-close", onClick: closeMobileNav }, t.close),
       React.createElement("img", { className: "mobile-nav-logo", src: "./src/assets/aorace.svg", alt: "Aorace" }),
-      React.createElement("nav", { "aria-label": "Mobile menu" }, navLinks)
+      React.createElement("nav", { "aria-label": "Mobile menu" }, mobileNavLinks)
+    )
+  );
+}
+
+function MegaMenuPanel({ menu, closeMegaMenu }) {
+  return React.createElement("div", { className: "mega-menu-panel" },
+    React.createElement("div", { className: "mega-menu-copy" },
+      React.createElement("a", {
+        href: menu.headingHref,
+        className: "mega-menu-heading",
+        onClick: closeMegaMenu,
+      }, menu.heading),
+      React.createElement("div", { className: "mega-menu-links" },
+        menu.links.map((link) =>
+          React.createElement("a", {
+            href: link.href,
+            className: "mega-menu-link",
+            key: link.key,
+            onClick: closeMegaMenu,
+          }, link.label)
+        )
+      )
+    ),
+    React.createElement("a", {
+      href: menu.feature.href,
+      className: "mega-menu-media",
+      onClick: closeMegaMenu,
+    },
+      React.createElement("img", {
+        src: menu.feature.image,
+        alt: menu.feature.alt,
+      }),
+      React.createElement("div", { className: "mega-menu-media-copy" },
+        React.createElement("span", null, menu.feature.eyebrow),
+        React.createElement("strong", null, menu.feature.title)
+      )
     )
   );
 }
@@ -555,7 +743,7 @@ function Footer({ t, navItems }) {
   return React.createElement("footer", { className: "footer" },
     React.createElement("div", null,
       React.createElement("h3", null, t.footerExplore),
-      navItems.slice(0, 5).map((item) => React.createElement("a", { href: "#", key: item }, item))
+      navItems.slice(0, 5).map((item) => React.createElement("a", { href: item.href || "#best-sellers", key: item.key }, item.label))
     ),
     React.createElement("div", null,
       React.createElement("h3", null, t.footerService),
