@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { CartDrawer } from "./components/CartDrawer.jsx";
 import { CheckoutModal } from "./components/CheckoutModal.jsx";
 import { CookiePanel } from "./components/CookiePanel.jsx";
 import { Footer } from "./components/Footer.jsx";
 import { Header } from "./components/Header.jsx";
+import { AppRouter } from "./router.jsx";
 import { SearchOverlay } from "./components/SearchOverlay.jsx";
 import { FishingRodsPage } from "./pages/FishingRodsPage.jsx";
 import { HomePage } from "./pages/HomePage.jsx";
@@ -181,8 +182,8 @@ function AppShell() {
 
 export function App() {
   return (
-    <BrowserRouter>
+    <AppRouter>
       <AppShell />
-    </BrowserRouter>
+    </AppRouter>
   );
 }

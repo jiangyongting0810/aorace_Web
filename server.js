@@ -1,6 +1,7 @@
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
+import { createSavedOrder, validateOrder } from "./shared/orders.js";
 
 const root = process.cwd();
 const distRoot = path.join(root, "dist");
@@ -30,20 +31,17 @@ const server = http.createServer((req, res) => {
     req.on("end", () => {
       try {
         const order = JSON.parse(body || "{}");
-        if (!order.customer?.email || !order.customer?.name || !Array.isArray(order.items) || !order.items.length) {
+        const validationError = validateOrder(order);
+        if (validationError) {
           res.writeHead(400, { "Content-Type": "application/json;charset=utf-8" });
-          res.end(JSON.stringify({ error: "Missing order information" }));
+          res.end(JSON.stringify({ error: validationError }));
           return;
         }
 
         const existing = fs.existsSync(ordersFile)
           ? JSON.parse(fs.readFileSync(ordersFile, "utf8") || "[]")
           : [];
-        const savedOrder = {
-          ...order,
-          orderId: `TF-${Date.now()}`,
-          status: "paid_pending_fulfillment",
-        };
+        const savedOrder = createSavedOrder(order);
         existing.push(savedOrder);
         fs.writeFileSync(ordersFile, JSON.stringify(existing, null, 2));
         res.writeHead(201, { "Content-Type": "application/json;charset=utf-8" });
