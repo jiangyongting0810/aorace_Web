@@ -38,6 +38,7 @@ The shared validation helpers live in `shared/orders.js` so the same rules can b
 
 - Netlify:
   Keep `VITE_ROUTER_MODE=browser`, build with `npm run build`, publish `dist`, and include `public/_redirects`.
+  The repository now includes `netlify.toml` and `netlify/functions/orders.js`, so Git-based deploys can use repo-managed settings instead of manual dashboard configuration.
 - Static hosts without rewrites:
   Set `VITE_ROUTER_MODE=hash`.
 - Custom backend or separate API:
