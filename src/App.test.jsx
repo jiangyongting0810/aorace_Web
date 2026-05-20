@@ -15,6 +15,7 @@ describe("FishWeb React app", () => {
     expect(screen.getByText("Free Shipping on Orders Over $50")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Shop by Categories" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Best Sellers" })).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: "+ Quick add" })).toHaveLength(4);
   });
 
   test("persists language choice in localStorage", async () => {

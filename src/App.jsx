@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { CartDrawer } from "./components/CartDrawer.jsx";
 import { CheckoutModal } from "./components/CheckoutModal.jsx";
@@ -19,20 +19,30 @@ import { useLocalStorageState } from "./hooks/useLocalStorageState.js";
 function ScrollEffects() {
   const location = useLocation();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    const header = document.querySelector(".site-header");
+    const hero = document.querySelector(".hero, .rods-hero, .reels-hero, .about-hero");
+    let enterFrame = 0;
+
     const updateHeaderState = () => {
-      const header = document.querySelector(".site-header");
-      const hero = document.querySelector(".hero, .rods-hero, .reels-hero, .about-hero");
       if (!header || !hero) return;
       const threshold = hero.offsetTop + hero.offsetHeight / 2;
       header.classList.toggle("is-pinned", window.scrollY >= threshold);
     };
 
     updateHeaderState();
+    if (header) {
+      header.classList.remove("is-entered");
+      enterFrame = window.requestAnimationFrame(() => {
+        header.classList.add("is-entered");
+      });
+    }
+
     window.addEventListener("scroll", updateHeaderState, { passive: true });
     window.addEventListener("resize", updateHeaderState);
 
     return () => {
+      window.cancelAnimationFrame(enterFrame);
       window.removeEventListener("scroll", updateHeaderState);
       window.removeEventListener("resize", updateHeaderState);
     };

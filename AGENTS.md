@@ -1,186 +1,319 @@
+# AGENTS.md
+
+禁止批量删除文件或目录。
+
+不要使用：
+
+- `del /s`
+- `rd /s`
+- `rmdir /s`
+- `Remove-Item -Recurse`
+- `rm -rf`
+
+需要删除文件时，只能一次删除一个明确路径的文件。
+
+正确示例：
+`Remove-Item "C:\path\to\file.txt"`
+
+如果需要批量删除文件，应停止操作，并向用户请求，让用户手动删除。
+
+---
+
 # FishWeb 项目说明
 
-这个文件是给以后跨对话继续开发时看的。新对话里只要先读这个文件，就能比较快理解当前项目结构、网页功能和改动注意事项。
+这个文件是给以后跨对话继续开发时看的。新对话里先读这个文件，可以快速理解当前项目结构、运行方式、页面能力和改动注意事项。
 
 ## 项目概览
 
-FishWeb 是一个鱼具独立站页面原型，品牌名目前是 TideForge。整体效果接近 Shopify 风格的电商首页，包含首页横幅、分类、热卖商品、购物车、结账弹窗、博客内容、用户评价和页脚。
+FishWeb 是一个鱼具独立站前端项目，品牌名目前是 TideForge。它已经从早期的单文件原型重构为标准化的 React 工程，当前使用 Vite 作为开发和构建工具，页面包含首页、鱼竿分类页、商品详情页、文章详情页、购物车抽屉、结账弹窗、搜索浮层、页脚和多语言内容。
 
-项目非常轻量，没有使用 npm 包管理、构建工具或打包流程。页面通过 `index.html` 直接加载 CSS、React 运行时代码和主应用脚本。
+项目目前仍然偏轻量，但已经具备完整的前端工程结构、基础测试、路由、持久化状态和双环境接口接入方式：
+
+- 本地开发时，前端通过 Vite 运行。
+- 本地 API 通过 `server.js` 提供。
+- 部署到 Netlify 时，订单接口走 `netlify/functions/orders.js`。
+
+## 当前技术栈
+
+- `Vite 8`
+- `React 19`
+- `ReactDOM 19`
+- `React Router DOM 7`
+- `Vitest`
+- `@testing-library/react`
+- `@testing-library/jest-dom`
+- `@testing-library/user-event`
+- `jsdom`
+- `Node.js` 原生 `http` 服务
+- `Netlify Functions`
+
+说明：
+
+- 当前组件写法已经是 `JSX`，不再是 `React.createElement` 方案。
+- `src/react-shim.js` 仍然在仓库里，但当前主入口已经切到 `src/main.jsx`。
+- 项目使用 `localStorage` 持久化语言、购物车和 Cookie 选择。
 
 ## 运行方式
 
-在项目根目录执行：
+在项目根目录可用这些命令：
+
+```powershell
+npm run dev
+```
+
+- 启动 Vite 前端开发服务。
+- 默认地址是 `http://127.0.0.1:5173`。
+- Vite 会把 `/api` 代理到本地 API 服务 `http://127.0.0.1:4173`。
+
+```powershell
+npm run api
+```
+
+- 启动本地订单接口服务。
+- 默认地址是 `http://127.0.0.1:4173`。
+- `PORT` 环境变量可以覆盖端口。
+
+```powershell
+npm run build
+```
+
+- 打包前端产物到 `dist/`。
+
+```powershell
+npm run preview
+```
+
+- 预览打包后的 Vite 产物。
+
+```powershell
+npm run test
+```
+
+- 运行 Vitest 测试。
+
+如果只想预览静态构建结果，也可以直接运行：
 
 ```powershell
 node server.js
 ```
 
-默认访问地址：
-
-```text
-http://127.0.0.1:4173
-```
-
-如果需要换端口，可以通过 `PORT` 环境变量覆盖。
+这时 `server.js` 会优先服务 `dist/`；如果 `dist/index.html` 不存在，则回退到项目根目录静态文件。
 
 ## 文件结构
 
+- `package.json`
+  - 项目依赖、脚本和模块类型配置。
+  - 当前是 `type: "module"`。
+
+- `vite.config.js`
+  - Vite 配置文件。
+  - 启用 React 插件。
+  - 本地开发端口为 `5173`。
+  - 配置 `/api` 到 `127.0.0.1:4173` 的代理。
+  - 同时包含 Vitest 配置。
+
 - `index.html`
-  - 网页入口文件。
-  - 加载 `src/styles.css`、`src/react-shim.js` 和 `src/App.js`。
-  - 预连接了 Unsplash 图片资源域名。
+  - Vite 入口 HTML。
+  - 页面根节点是给 React 挂载用的 `#root`。
 
-- `server.js`
-  - 一个很小的 Node.js HTTP 服务器。
-  - 用来预览静态页面。
-  - 处理 `POST /api/orders` 订单提交接口。
-  - 成功提交的订单会保存到根目录的 `orders.json`。
-  - 默认监听 `127.0.0.1:4173`。
+- `src/main.jsx`
+  - 当前前端真正入口。
+  - 挂载 `App`，并引入全局样式。
 
-- `src/App.js`
-  - 网页主逻辑文件。
-  - 页面文案、商品数据、分类数据、博客数据、评价数据、React 状态和组件都在这里。
-  - 当前使用 `React.createElement` 写组件，没有 JSX 编译流程。
-  - 支持英文和中文切换，文案集中在 `copy.en` 和 `copy.zh`。
+- `src/App.jsx`
+  - 应用总装配文件。
+  - 负责路由、全局状态、购物车逻辑、搜索浮层、结账弹窗、Cookie 面板等。
 
-- `src/styles.css`
-  - 全站样式文件。
-  - 包含颜色变量、布局、响应式断点、购物车抽屉、结账弹窗等所有样式。
+- `src/router.jsx`
+  - 路由容器封装。
+  - 根据运行时配置决定使用 `BrowserRouter` 或 `HashRouter`。
 
-- `src/react-shim.js`
-  - 提供 `React` 和 `ReactDOM` 运行时。
-  - `src/App.js` 依赖它运行。
+- `src/config/runtime.js`
+  - 运行时配置。
+  - 负责拼接 API 地址。
+  - 支持通过环境变量切换路由模式和 API 基地址。
+
+- `src/pages/`
+  - 页面级组件。
+  - 当前包括：
+    - `HomePage.jsx`
+    - `FishingRodsPage.jsx`
+    - `ProductDetailPage.jsx`
+    - `StoryDetailPage.jsx`
+
+- `src/components/`
+  - 通用界面组件。
+  - 当前包括：
+    - `Header.jsx`
+    - `Footer.jsx`
+    - `CartDrawer.jsx`
+    - `CheckoutModal.jsx`
+    - `SearchOverlay.jsx`
+    - `CookiePanel.jsx`
+
+- `src/hooks/useLocalStorageState.js`
+  - 封装带本地持久化的状态。
+
+- `src/services/orders.js`
+  - 前端订单提交服务。
+  - 统一请求 `/api/orders`。
+
+- `src/data/content.js`
+  - 页面文案与数据源。
+  - 中英文文案、导航、商品、分类、文章、评价等通常集中在这里。
+
+- `src/utils/format.js`
+  - 展示层格式化工具。
+
+- `src/test/setup.js`
+  - Vitest 测试初始化。
+  - 补齐 `scrollTo`、`requestAnimationFrame` 等测试环境能力。
+
+- `src/App.test.jsx`
+  - 当前基础测试。
+  - 覆盖首页渲染、语言持久化、购物车持久化、详情页路由、分类页排序弹层等。
 
 - `src/assets/`
-  - `aorace.svg`：顶部品牌 Logo。
-  - `hero-banner.png`：首页大横幅图片。
-  - `jiantou.svg`：分类卡片悬浮时出现的箭头图标。
+  - 项目图片和图标资源。
 
-## 网页功能理解
+- `public/_redirects`
+  - 部署时的静态路由回退配置。
 
-当前页面是一个单页电商首页，主要功能如下。
+- `server.js`
+  - 本地 Node.js HTTP 服务。
+  - 同时负责静态资源预览与 `POST /api/orders`。
+
+- `shared/orders.js`
+  - 订单共享逻辑。
+  - 提供 `validateOrder()` 和 `createSavedOrder()`。
+  - 供本地 Node 服务和 Netlify Functions 共用。
+
+- `netlify/functions/orders.js`
+  - Netlify 订单函数入口。
+  - 与本地 API 共享订单校验和订单生成逻辑。
+
+- `netlify.toml`
+  - Netlify 构建与函数目录配置。
+
+- `dist/`
+  - Vite 打包产物目录。
+
+## 当前页面和功能理解
+
+当前项目已经不是单页静态原型，而是一个有路由的前端应用。主要能力如下。
 
 1. 顶部公告栏
-   - 显示满 $50 免运费文案。
-   - 会跟随语言切换成英文或中文。
+   - 显示免运费文案。
+   - 文案随语言切换。
 
 2. 顶部导航
-   - 左侧显示品牌 Logo。
-   - 桌面端显示导航菜单：首页、鱼竿、渔轮、拟饵、促销、关于、支持。
-   - 移动端目前只显示菜单图标，还没有真正的移动菜单抽屉。
-   - 页面刚打开时，导航透明覆盖在横幅上。
-   - 页面滚动到横幅中段以后，导航会变成固定顶部的半透明毛玻璃样式。
-   - 支持中英文切换按钮。
-   - 搜索按钮会打开搜索弹窗。
-   - 购物车按钮会打开购物车抽屉，并显示当前商品数量。
+   - 有桌面导航、语言切换、搜索入口、购物车入口、移动端菜单状态。
+   - 鱼竿分类带有 mega menu。
+   - 页面滚动时会根据首屏区块切换固定头部样式。
 
-3. 首页大横幅
-   - 使用 `src/assets/hero-banner.png` 作为满宽大图。
-   - `Hero` 组件虽然接收了文案参数，但当前实际只渲染图片，没有显示标题、描述或按钮。
+3. 首页
+   - 由 `HomePage.jsx` 负责。
+   - 包含 Hero、分类、热卖、品牌故事、文章、评价、服务承诺等内容。
+   - `#best-sellers` 当前首页仅展示前 4 个商品卡片，维持单行四列，不直接渲染全部商品数据。
 
-4. 商品分类区
-   - 从 `categories` 数据中取前三个分类展示。
-   - 当前分类包括渔轮、鱼竿、拟饵等。
-   - 卡片点击会跳到热卖商品区 `#best-sellers`。
-   - 鼠标悬浮时图片会放大，并显示箭头图标。
-   - 分类名称支持中英文切换。
+4. 鱼竿分类页
+   - 由 `FishingRodsPage.jsx` 负责。
+   - 已有独立路由，不再只是锚点跳转。
+   - 包含排序交互。
 
-5. 热卖商品区
-   - 从 `products` 数组渲染商品卡片。
-   - 每个商品显示图片、名称、价格、原价、颜色数量、评分、评论数和快速加购按钮。
-   - 点击快速加购会把商品默认规格加入购物车，并自动打开购物车抽屉。
-   - 底部的左右滑动按钮目前只是视觉元素，没有实际轮播功能。
+5. 商品详情页
+   - 由 `ProductDetailPage.jsx` 负责。
+   - 路由形式为 `/products/:productId`。
 
-6. 关于我们区
-   - 一块全宽灰底内容区。
-   - 包含钓鱼图片、关于品牌的文案和“了解更多”按钮。
-   - 文案支持中英文切换。
+6. 文章详情页
+   - 由 `StoryDetailPage.jsx` 负责。
+   - 路由形式为 `/stories/:slug`。
 
-7. 资讯 / 文章区
-   - 从 `blogs` 数组渲染三篇文章卡片。
-   - 标题支持中英文切换。
-   - 链接目前都是占位链接，没有真实文章详情页。
+7. 购物车抽屉
+   - 支持打开、关闭、数量修改、移除商品、显示小计。
+   - 商品加入购物车后会保存在 `localStorage`。
 
-8. 用户评价区
-   - 从 `reviews` 数组渲染三条用户评价。
-   - 目前评价内容只有英文，没有中文版本。
+8. 结账弹窗
+   - 从购物车进入。
+   - 前端通过 `src/services/orders.js` 提交订单。
+   - 成功后清空购物车并展示订单结果。
 
-9. 服务承诺栏
-   - 显示四个服务点：满额免运、快速配送、一年质保、30 天免费退货。
-   - 文案支持中英文切换。
+9. 搜索浮层
+   - 作为独立组件存在。
+   - 当前仍以展示和入口交互为主。
 
-10. 页脚
-    - 分为探索、客户服务、关于、订阅四栏。
-    - 订阅表单目前只阻止默认提交，不会保存或发送邮箱。
-    - 页脚链接目前都是占位链接。
+10. Cookie 面板
+    - 同意或拒绝结果会写入 `localStorage`。
 
-11. 购物车抽屉
-    - 从页面右侧滑出。
-    - 显示已添加商品、规格、数量控制、删除按钮、小计、结账按钮和继续购物入口。
-    - 数量最少为 1，点减号不会把商品减到 0；要删除商品需要点“移除”。
+11. 多语言切换
+    - 当前语言状态会写入 `localStorage`。
 
-12. 结账弹窗
-    - 从购物车点击结账后打开。
-    - 表单包含联系方式、配送信息、订单备注和支付方式。
-    - 必填字段包括邮箱、姓名、电话、详细地址、城市、州/省、邮编。
-    - 提交时会请求 `POST /api/orders`。
-    - 提交成功后会清空购物车，并显示订单号。
-    - 支付方式只是界面选项，没有真实支付功能。
-
-13. 搜索弹窗
-    - 点击顶部搜索按钮打开。
-    - 有搜索输入框和固定提示词。
-    - 当前没有真实搜索、筛选或跳转功能。
-
-14. Cookie 提示
-    - 页面首次加载时显示。
-    - 接受和拒绝都会隐藏提示。
-    - 当前选择不会保存到 localStorage 或 cookie，刷新页面后会再次出现。
+12. 前端路由
+    - 使用 React Router。
+    - 未命中的路由会重定向回首页。
 
 ## 关键代码位置
 
-- 页面文案：
-  - `src/App.js` 顶部的 `copy.en` 和 `copy.zh`。
+- 应用入口：
+  - `src/main.jsx`
 
-- 商品数据：
-  - `src/App.js` 顶部的 `products` 数组。
+- 应用装配与全局状态：
+  - `src/App.jsx`
 
-- 分类数据：
-  - `src/App.js` 顶部的 `categories` 数组。
+- 路由模式切换：
+  - `src/router.jsx`
+  - `src/config/runtime.js`
 
-- 博客数据：
-  - `src/App.js` 顶部的 `blogs` 数组。
+- 页面文案和数据：
+  - `src/data/content.js`
 
-- 用户评价：
-  - `src/App.js` 顶部的 `reviews` 数组。
+- 顶部导航、页脚、浮层：
+  - `src/components/Header.jsx`
+  - `src/components/Footer.jsx`
+  - `src/components/SearchOverlay.jsx`
+  - `src/components/CookiePanel.jsx`
 
 - 购物车逻辑：
-  - `App()` 里的 `cartItems` 状态。
-  - `addToCart`、`updateQuantity`、`removeItem`。
-  - `CartDrawer` 组件负责显示购物车。
+  - `src/App.jsx` 中的 `cartItems`
+  - `addToCart`
+  - `updateQuantity`
+  - `removeItem`
+  - `src/components/CartDrawer.jsx`
 
 - 结账逻辑：
-  - `CheckoutModal` 组件负责表单、校验和提交。
-  - `server.js` 负责接收订单并保存到 `orders.json`。
+  - `src/components/CheckoutModal.jsx`
+  - `src/services/orders.js`
+  - `shared/orders.js`
+  - `server.js`
+  - `netlify/functions/orders.js`
 
-- 顶部导航滚动变色：
-  - `src/App.js` 底部的 `updateHeaderState()`。
-  - 根据页面滚动位置给 `.site-header` 添加或移除 `.is-pinned`。
+- 本地持久化：
+  - `src/hooks/useLocalStorageState.js`
+
+- 测试：
+  - `src/App.test.jsx`
+  - `src/test/setup.js`
 
 ## 当前主要状态
 
-`App()` 里维护这些状态：
+`src/App.jsx` 里维护的核心状态包括：
 
-- `lang`：当前语言，`en` 或 `zh`。
-- `cartItems`：购物车商品。
-- `cartOpen`：购物车抽屉是否打开。
-- `checkoutOpen`：结账弹窗是否打开。
-- `searchOpen`：搜索弹窗是否打开。
-- `cookieVisible`：Cookie 提示是否显示。
-- `orderResult`：订单提交成功后的返回结果。
+- `lang`：当前语言，`en` 或 `zh`
+- `cartItems`：购物车商品列表
+- `cookieConsent`：Cookie 选择结果
+- `cartOpen`：购物车抽屉是否打开
+- `checkoutOpen`：结账弹窗是否打开
+- `searchOpen`：搜索浮层是否打开
+- `mobileNavOpen`：移动端菜单是否打开
+- `orderResult`：订单提交成功后的返回结果
 
-购物车商品的唯一标识由商品 ID 和规格拼成：
+其中以下状态会持久化到 `localStorage`：
+
+- `tideforge-lang`
+- `tideforge-cart`
+- `tideforge-cookie-consent`
+
+购物车商品的唯一标识仍然是商品 ID 和规格拼接后的 key：
 
 ```js
 `${product.id}-${option}`
@@ -188,64 +321,84 @@ http://127.0.0.1:4173
 
 ## 订单保存方式
 
-订单不是提交到真实后端或支付系统，而是保存在本地文件：
+当前有两套订单接入方式：
+
+### 本地开发
+
+- 接口地址：`POST /api/orders`
+- 由 `server.js` 处理
+- 成功提交的订单会追加保存到项目根目录的 `orders.json`
+
+### Netlify 部署
+
+- 接口地址同样是 `POST /api/orders`
+- 由 `netlify/functions/orders.js` 处理
+- 当前函数返回订单号和状态
+- 共享校验与订单生成逻辑在 `shared/orders.js`
+
+当前共享校验规则较基础：
+
+- `order` 必须是对象
+- 必须有 `customer.email`
+- 必须有 `customer.name`
+- `items` 必须是非空数组
+
+订单号仍然采用：
 
 ```text
-orders.json
+TF-时间戳
 ```
 
-这个文件只有在第一次成功提交订单后才会生成。
+订单状态为：
 
-订单接口逻辑在 `server.js`：
+```text
+paid_pending_fulfillment
+```
 
-- 接收 `POST /api/orders`。
-- 检查是否有邮箱、姓名和商品列表。
-- 生成类似 `TF-时间戳` 的订单号。
-- 设置订单状态为 `paid_pending_fulfillment`。
-- 把订单追加保存到 `orders.json`。
+## 当前仍偏占位或待完善的部分
 
-## 当前还是占位的功能
+下面这些点里，有些已经有页面壳子，但业务能力仍不完整：
 
-以下功能目前只有界面或按钮，还没有真实业务逻辑：
-
-- 移动端菜单。
-- 账户按钮。
-- 商品轮播按钮。
-- 搜索功能。
-- 商品详情页。
-- 博客详情页。
-- 页脚链接。
-- 邮箱订阅。
-- 真实支付。
-- Cookie 选择持久化。
-- 购物车持久化。
-- 语言选择持久化。
+- 搜索仍偏展示型，没有完整检索结果能力
+- 账户相关功能未接入
+- 真实支付未接入
+- 邮箱订阅未接入真实保存或发送逻辑
+- 订单后台、订单列表、导出能力还没有
+- 商品筛选、分页、集合页能力还可以继续扩展
+- 内容管理仍以本地数据文件为主，没有 CMS
+- 图片资源和商品数据目前仍偏静态
 
 ## 样式和布局说明
 
-- 所有样式都在 `src/styles.css`。
-- 主色调是黑白灰，加绿色强调色和红色促销价。
-- 页面整体是干净的电商独立站风格。
-- 首页横幅高度目前固定为 `910px`，桌面端和移动端都是这个高度。
-- `1100px` 以下会隐藏桌面导航，并让多列布局减少列数。
-- `720px` 以下大部分内容变成单列，结账弹窗变成接近全屏。
+- 全局样式主要在 `src/styles.css`
+- 设计风格仍然是黑白灰为主，配合绿色强调色和红色促销价
+- 资源图片放在 `src/assets/`
+- 当前已经不是单一首页布局，而是首页加详情页加集合页的结构
+- 首页热卖区当前按桌面端单行 4 卡控制，若后续改成轮播或多行展示，要同步更新 `HomePage.jsx` 与相关测试
+- 页头滚动吸顶效果依赖 `.hero` 或 `.rods-hero` 区块高度计算
 
 ## 以后改动建议
 
-- 新增可见文案时，尽量同时维护 `copy.en` 和 `copy.zh`。
-- 新增商品字段时，要同时改 `products` 数据和 `ProductSection` 的渲染逻辑。
-- 如果要做真实导航，注意当前很多链接是 `href="#"` 或锚点链接，不要误删现有跳转行为。
-- 如果要增强结账，客户端校验在 `CheckoutModal`，服务端校验在 `server.js`，两边最好同步修改。
-- 如果要保存语言、购物车或 Cookie 选择，可以从 `App()` 初始化状态时读取 localStorage。
-- 修改 `server.js` 的静态文件路径逻辑时要小心，它现在有防止目录穿越的检查。
+- 新增可见文案时，优先同步维护中英文版本
+- 新增路由时，同时检查：
+  - `src/App.jsx` 的 `<Routes>`
+  - `public/_redirects`
+  - `src/config/runtime.js` 的路由模式兼容
+- 修改订单字段时，同时更新：
+  - `src/components/CheckoutModal.jsx`
+  - `src/services/orders.js`
+  - `shared/orders.js`
+  - `server.js`
+  - `netlify/functions/orders.js`
+- 修改本地持久化键名时，要考虑旧数据兼容
+- 修改 `server.js` 静态文件逻辑时，要保留目录穿越防护
+- 如果删掉 `src/react-shim.js` 或 `src/App.js`，先确认没有遗留引用后再处理
 
 ## 值得优先补的功能
 
-- 做移动端菜单抽屉。
-- 做真实搜索，可以先搜索商品、分类和文章标题。
-- 把语言、购物车、Cookie 选择保存到 localStorage。
-- 做商品详情页或简单的页面路由。
-- 让商品轮播按钮真正可用。
-- 补齐用户评价和页脚内容的中文文案。
-- 做一个订单列表或导出功能，方便查看 `orders.json`。
-- 项目变大以后，可以考虑增加基础测试或浏览器检查流程。
+- 做真实搜索结果页或联想搜索
+- 补商品筛选、排序、分页和集合页体验
+- 增强商品详情页信息密度与转化组件
+- 做订单查看或导出功能，方便检查 `orders.json`
+- 继续补测试，至少覆盖结账提交流程和关键路由
+- 评估是否要把静态内容迁移到更清晰的数据层或 CMS

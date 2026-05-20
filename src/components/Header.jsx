@@ -108,14 +108,14 @@ export function Header({
                 onMouseEnter={() => scheduleMegaMenuOpen(item.key)}
                 onMouseLeave={scheduleMegaMenuClose}
               >
-                <button
-                  type="button"
+                <SmartLink
+                  href={item.href}
                   className="nav-trigger"
-                  aria-expanded={activeMegaMenuKey === item.key}
-                  aria-haspopup="true"
+                  onClick={closeMegaMenuImmediately}
                 >
-                  {item.label}
-                </button>
+                  <span>{item.label}</span>
+                  <span className="nav-chevron" aria-hidden="true">▾</span>
+                </SmartLink>
                 <MegaMenuPanel menu={item.megaMenu} closeMegaMenu={closeMegaMenuImmediately} />
               </div>
             ) : (

@@ -31,6 +31,8 @@ function CategorySection({ t, lang }) {
 }
 
 function ProductSection({ t, addToCart }) {
+  const featuredProducts = products.slice(0, 4);
+
   return (
     <section className="section products" id="best-sellers">
       <div className="section-title-row">
@@ -41,7 +43,7 @@ function ProductSection({ t, addToCart }) {
         </Link>
       </div>
       <div className="product-grid">
-        {products.map((product) => (
+        {featuredProducts.map((product) => (
           <article className="product-card" key={product.id}>
             <Link to={`/products/${product.id}`} className="product-image">
               {product.badge && <span className="sale-badge">{product.badge}</span>}
