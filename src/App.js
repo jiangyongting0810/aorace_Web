@@ -182,7 +182,7 @@ const categories = [
 const products = [
   {
     id: "m1-spinning-reel",
-    name: "HANDING M1 Spinning Reel",
+    name: "Aorace M1 Spinning Reel",
     price: "$22.99 USD",
     amount: 22.99,
     colors: 1,
@@ -194,7 +194,7 @@ const products = [
   },
   {
     id: "m1-elite-spinning-reel",
-    name: "HANDING M1 Elite Spinning Reel",
+    name: "Aorace M1 Elite Spinning Reel",
     price: "$33.99 USD",
     amount: 33.99,
     colors: 2,
@@ -206,7 +206,7 @@ const products = [
   },
   {
     id: "m1-travel-casting-rod",
-    name: "HANDING M1 Travel Casting Rod",
+    name: "Aorace M1 Travel Casting Rod",
     price: "$62.99 USD",
     amount: 62.99,
     colors: 1,
@@ -218,7 +218,7 @@ const products = [
   },
   {
     id: "m1-trout-casting-rod",
-    name: "HANDING M1 Trout Ultralight Two Pieces Casting Rod",
+    name: "Aorace M1 Trout Ultralight Two Pieces Casting Rod",
     price: "$57.79 USD",
     amount: 57.79,
     oldPrice: "$67.99 USD",

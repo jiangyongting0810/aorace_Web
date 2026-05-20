@@ -7,12 +7,22 @@ import bestReel from "../assets/best-reel.png";
 import bestLures from "../assets/best-lures.png";
 import experienceWhitebait from "../assets/experience-whitebait.png";
 import experienceStream from "../assets/experience-stream.png";
+import aboutUsBanner from "../assets/about-us-pc.webp";
+import productEliteReel from "../assets/product-elite-reel.jpg";
+import productReel from "../assets/product-reel.jpg";
+import productTravelRod from "../assets/product-travel-rod.jpg";
+import productTroutLure from "../assets/product-trout-lure.jpg";
 
 export const assets = {
   aoraceLogo,
   heroBanner,
   categoryRods,
   categoryReels,
+  aboutUsBanner,
+  productEliteReel,
+  productReel,
+  productTravelRod,
+  productTroutLure,
 };
 
 const reelsFaqEn = [
@@ -243,6 +253,79 @@ export const copy = {
     heroTitle: "TideForge Fishing Tackle",
     heroSubtitle: "Reliable rods, reels and lures built for everyday anglers.",
     heroCta: "Shop Bestseller",
+    aboutPage: {
+      heroTitle: "About Aorace Fishing",
+      heroSubtitle: "Unleash the Thrill of Casting",
+      sections: [
+        {
+          eyebrow: "Our story",
+          title: "Built from real water time, not showroom theory",
+          body: "Aorace Fishing grew out of the kind of product frustration that only shows up after long casting days. We set out to build tackle that feels balanced, holds up to repeated use, and gives everyday anglers gear they can trust without paying for empty hype.",
+          image: productTravelRod,
+          alt: "Aorace travel fishing rod displayed against an outdoor backdrop",
+        },
+        {
+          eyebrow: "Know the angler",
+          title: "We design around how people actually fish",
+          body: "Our team spends time listening to shore anglers, weekend bass fishermen, family travelers, and first-time buyers who need gear that is intuitive on day one. That feedback shapes everything from handle feel to drag tuning, packability, and component durability.",
+          image: productReel,
+          alt: "Close-up spinning reel detail photograph",
+        },
+        {
+          eyebrow: "Brand goal",
+          title: "Make dependable performance easier to reach",
+          body: "The goal is simple: close the gap between entry-level pricing and confident on-the-water performance. We focus on clean engineering, practical material choices, and tackle that gives anglers a better experience before, during, and after the cast.",
+          image: productEliteReel,
+          alt: "Fishing reel and tackle detail arrangement",
+        },
+      ],
+      trust: {
+        eyebrow: "Production strength",
+        title: "We are Trust Worthy",
+        body: "Aorace operates with direct production involvement and long-term factory discipline, which gives us tighter control over tolerances, assembly consistency, finish quality, and final inspection. We do not treat manufacturing like a black box. That control is how we keep quality stable while staying accessible on price.",
+        image: aboutUsBanner,
+        alt: "Aorace production and workshop environment",
+      },
+      timelineTitle: "Brand milestones",
+      timelineIntro: "From the first workshop foundation to global expansion plans, each step reflects a deliberate push toward better gear, stronger production, and a clearer brand voice.",
+      timeline: [
+        {
+          year: "2012",
+          title: "Brand foundation",
+          body: "Aorace Fishing was established with a focus on practical tackle for anglers who needed dependable performance without premium-brand pricing.",
+        },
+        {
+          year: "2015",
+          title: "Product line expansion",
+          body: "The catalog expanded across rods, reels, and core accessories, allowing the brand to support more techniques and more complete fishing setups.",
+        },
+        {
+          year: "2019",
+          title: "Factory capability upgrade",
+          body: "Production systems, QC standards, and component sourcing were strengthened to support larger volume and more consistent build quality.",
+        },
+        {
+          year: "2020",
+          title: "30,000 square meter industrial park",
+          body: "A larger industrial footprint created room for integrated production flow, better tooling coordination, and faster iteration from concept to shipment.",
+        },
+        {
+          year: "2023",
+          title: "Global market acceleration",
+          body: "Aorace increased overseas reach, serving more anglers across North America and other export markets through a broader digital retail presence.",
+        },
+        {
+          year: "Future",
+          title: "Sharper tackle, wider reach",
+          body: "The next stage is centered on more refined category development, stronger brand storytelling, and gear that continues to simplify performance for modern anglers.",
+        },
+      ],
+      cta: {
+        title: "Join Us Today",
+        body: "Step into a lineup shaped by real casting pressure, factory-backed consistency, and gear designed to make every trip feel more dialed in from the first cast to the last fish.",
+        button: "Shop Aorace Fishing Gear",
+      },
+    },
     rodsPage: {
       heroTitle: "Fishing Rods",
       heroBody: "Built for weekend shorelines, packed travel kits and all-day casting comfort. Explore TideForge rods by style, pieces and budget.",
@@ -376,6 +459,79 @@ export const copy = {
     heroTitle: "TideForge \u6e14\u5177",
     heroSubtitle: "\u4e3a\u65e5\u5e38\u9493\u9c7c\u6253\u9020\u7684\u9ad8\u6027\u4ef7\u6bd4\u9c7c\u7aff\u3001\u6e14\u8f6e\u548c\u62df\u9975\u3002",
     heroCta: "\u9009\u8d2d\u70ed\u5356",
+    aboutPage: {
+      heroTitle: "About Aorace Fishing",
+      heroSubtitle: "Unleash the Thrill of Casting",
+      sections: [
+        {
+          eyebrow: "\u54c1\u724c\u6545\u4e8b",
+          title: "\u4ece\u771f\u5b9e\u4f5c\u9493\u4f53\u9a8c\u51fa\u53d1\uff0c\u800c\u4e0d\u662f\u7eb8\u9762\u53c2\u6570\u51fa\u53d1",
+          body: "Aorace Fishing \u7684\u8d77\u70b9\uff0c\u6765\u81ea\u9493\u624b\u5728\u957f\u65f6\u95f4\u629b\u6295\u548c\u9ad8\u9891\u4f7f\u7528\u4e2d\u9047\u5230\u7684\u771f\u5b9e\u95ee\u9898\u3002\u6211\u4eec\u60f3\u505a\u7684\u662f\u4e00\u5957\u66f4\u987a\u624b\u3001\u66f4\u8010\u7528\u3001\u66f4\u503c\u5f97\u957f\u671f\u4fe1\u4efb\u7684\u88c5\u5907\uff0c\u800c\u4e0d\u662f\u53ea\u9760\u5ba3\u4f20\u5806\u8d77\u6765\u7684\u4ea7\u54c1\u3002",
+          image: productTravelRod,
+          alt: "Aorace \u65c5\u884c\u9c7c\u7aff\u5c55\u793a\u56fe",
+        },
+        {
+          eyebrow: "\u7406\u89e3\u7528\u6237",
+          title: "\u56f4\u7ed5\u771f\u5b9e\u9493\u624b\u7684\u4f7f\u7528\u65b9\u5f0f\u53bb\u8bbe\u8ba1",
+          body: "\u65e0\u8bba\u662f\u5cb8\u9493\u73a9\u5bb6\u3001\u5468\u672b\u8def\u4e9a\u73a9\u5bb6\u3001\u5bb6\u5ead\u51fa\u884c\u7528\u6237\uff0c\u8fd8\u662f\u7b2c\u4e00\u6b21\u63a5\u89e6\u6e14\u5177\u7684\u65b0\u624b\uff0c\u6211\u4eec\u90fd\u4f1a\u628a\u4ed6\u4eec\u7684\u53cd\u9988\u653e\u8fdb\u4ea7\u54c1\u8bbe\u8ba1\u91cc\u3002\u63e1\u6301\u611f\u3001\u6cc4\u529b\u8c03\u6821\u3001\u6536\u7eb3\u4fbf\u5229\u6027\u548c\u8010\u7528\u5ea6\uff0c\u90fd\u6765\u81ea\u8fd9\u4e9b\u771f\u5b9e\u573a\u666f\u3002",
+          image: productReel,
+          alt: "\u6e14\u8f6e\u4ea7\u54c1\u7ec6\u8282\u8fd1\u666f",
+        },
+        {
+          eyebrow: "\u54c1\u724c\u76ee\u6807",
+          title: "\u8ba9\u53ef\u9760\u6027\u80fd\u53d8\u5f97\u66f4\u5bb9\u6613\u83b7\u5f97",
+          body: "\u6211\u4eec\u7684\u76ee\u6807\u4e0d\u662f\u628a\u53c2\u6570\u505a\u5f97\u5938\u5f20\uff0c\u800c\u662f\u8ba9\u66f4\u591a\u4eba\u7528\u5408\u7406\u9884\u7b97\u62ff\u5230\u771f\u6b63\u7a33\u5b9a\u3001\u597d\u63a7\u3001\u8010\u7528\u7684\u6e14\u5177\u3002Aorace \u66f4\u5173\u6ce8\u6750\u6599\u9009\u62e9\u3001\u7ed3\u6784\u7ec6\u8282\u548c\u957f\u671f\u4f53\u9a8c\uff0c\u800c\u4e0d\u662f\u77ed\u671f\u5651\u5934\u3002",
+          image: productEliteReel,
+          alt: "\u6e14\u8f6e\u4e0e\u6e14\u5177\u7ec4\u5408\u7ec6\u8282\u5c55\u793a",
+        },
+      ],
+      trust: {
+        eyebrow: "\u751f\u4ea7\u5b9e\u529b",
+        title: "We are Trust Worthy",
+        body: "Aorace \u6df1\u5ea6\u53c2\u4e0e\u751f\u4ea7\u5236\u9020\u73af\u8282\uff0c\u5bf9\u516c\u5dee\u3001\u88c5\u914d\u4e00\u81f4\u6027\u3001\u8868\u9762\u5de5\u827a\u548c\u51fa\u5382\u68c0\u6d4b\u90fd\u6709\u66f4\u76f4\u63a5\u7684\u628a\u63a7\u3002\u6211\u4eec\u4e0d\u662f\u5355\u7eaf\u505a\u6e20\u9053\u642c\u8fd0\uff0c\u800c\u662f\u4f9d\u9760\u7a33\u5b9a\u7684\u5de5\u5382\u80fd\u529b\uff0c\u628a\u54c1\u8d28\u548c\u4ef7\u683c\u63a7\u5236\u5728\u4e00\u4e2a\u66f4\u53ef\u4fe1\u7684\u5e73\u8861\u70b9\u4e0a\u3002",
+        image: aboutUsBanner,
+        alt: "Aorace \u5de5\u5382\u4e0e\u751f\u4ea7\u73af\u5883",
+      },
+      timelineTitle: "\u54c1\u724c\u5386\u7a0b",
+      timelineIntro: "\u4ece\u54c1\u724c\u521b\u7acb\u5230\u4ea7\u80fd\u5347\u7ea7\uff0c\u518d\u5230\u9762\u5411\u5168\u7403\u5e02\u573a\u7684\u6269\u5f20\uff0c\u6bcf\u4e00\u4e2a\u8282\u70b9\u90fd\u5bf9\u5e94\u7740\u4ea7\u54c1\u529b\u548c\u5236\u9020\u529b\u7684\u6301\u7eed\u63a8\u8fdb\u3002",
+      timeline: [
+        {
+          year: "2012",
+          title: "\u54c1\u724c\u521b\u7acb",
+          body: "Aorace Fishing \u6b63\u5f0f\u6210\u7acb\uff0c\u5f00\u59cb\u56f4\u7ed5\u9ad8\u6027\u4ef7\u6bd4\u3001\u53ef\u9760\u8010\u7528\u7684\u9493\u9c7c\u88c5\u5907\u5efa\u7acb\u4ea7\u54c1\u57fa\u7840\u3002",
+        },
+        {
+          year: "2015",
+          title: "\u4ea7\u54c1\u7ebf\u6269\u5c55",
+          body: "\u54c1\u724c\u9010\u6b65\u6269\u5c55\u5230\u9c7c\u7aff\u3001\u6e14\u8f6e\u548c\u6838\u5fc3\u914d\u4ef6\uff0c\u5f62\u6210\u66f4\u5b8c\u6574\u7684\u4f5c\u9493\u88c5\u5907\u7ec4\u5408\u3002",
+        },
+        {
+          year: "2019",
+          title: "\u5236\u9020\u80fd\u529b\u5347\u7ea7",
+          body: "\u56f4\u7ed5\u8d28\u68c0\u6807\u51c6\u3001\u90e8\u4ef6\u4f9b\u5e94\u548c\u751f\u4ea7\u6d41\u7a0b\u8fdb\u884c\u5347\u7ea7\uff0c\u4e3a\u66f4\u5927\u89c4\u6a21\u548c\u66f4\u7a33\u5b9a\u7684\u4e00\u81f4\u6027\u6253\u4e0b\u57fa\u7840\u3002",
+        },
+        {
+          year: "2020",
+          title: "\u5efa\u8bbe\u4e09\u4e07\u5e73\u5de5\u4e1a\u56ed",
+          body: "\u66f4\u5927\u7684\u5de5\u4e1a\u56ed\u533a\u8ba9\u751f\u4ea7\u534f\u540c\u3001\u5de5\u827a\u6253\u6837\u548c\u51fa\u8d27\u8282\u594f\u90fd\u66f4\u9ad8\u6548\uff0c\u4e5f\u8ba9\u54c1\u724c\u5177\u5907\u66f4\u5f3a\u7684\u8fed\u4ee3\u80fd\u529b\u3002",
+        },
+        {
+          year: "2023",
+          title: "\u5168\u7403\u5e02\u573a\u52a0\u901f\u62d3\u5c55",
+          body: "Aorace \u6301\u7eed\u6269\u5927\u6d77\u5916\u5e02\u573a\u8986\u76d6\uff0c\u901a\u8fc7\u66f4\u5b8c\u6574\u7684\u7ebf\u4e0a\u6e20\u9053\u670d\u52a1\u5317\u7f8e\u7b49\u66f4\u591a\u5730\u533a\u7684\u9493\u624b\u3002",
+        },
+        {
+          year: "Future",
+          title: "\u7ee7\u7eed\u6269\u5c55\u66f4\u6e05\u6670\u7684\u54c1\u724c\u7248\u56fe",
+          body: "\u672a\u6765\u6211\u4eec\u4f1a\u7ee7\u7eed\u6df1\u5316\u54c1\u7c7b\u3001\u5f3a\u5316\u54c1\u724c\u5185\u5bb9\u8868\u8fbe\uff0c\u5e76\u7528\u66f4\u6210\u719f\u7684\u4ea7\u54c1\u4f53\u7cfb\u670d\u52a1\u66f4\u5e7f\u6cdb\u7684\u73b0\u4ee3\u9493\u9c7c\u4eba\u7fa4\u3002",
+        },
+      ],
+      cta: {
+        title: "Join Us Today",
+        body: "\u52a0\u5165 Aorace\uff0c\u4e00\u8d77\u4f53\u9a8c\u6765\u81ea\u771f\u5b9e\u4f5c\u9493\u9700\u6c42\u3001\u7a33\u5b9a\u5236\u9020\u80fd\u529b\u548c\u957f\u671f\u4ea7\u54c1\u6253\u78e8\u6240\u5e26\u6765\u7684\u66f4\u987a\u624b\u88c5\u5907\u4f53\u9a8c\u3002",
+        button: "Shop Aorace Fishing Gear",
+      },
+    },
     rodsPage: {
       heroTitle: "\u9c7c\u7aff",
       heroBody: "\u4e3a\u5468\u672b\u5cb8\u9493\u3001\u51fa\u884c\u6536\u7eb3\u548c\u957f\u65f6\u95f4\u629b\u6295\u800c\u8bbe\u8ba1\u3002\u6309\u7c7b\u578b\u3001\u8282\u6570\u548c\u4ef7\u683c\u5feb\u901f\u7b5b\u9009 TideForge \u9c7c\u7aff\u3002",
@@ -528,7 +684,7 @@ export const categories = [
 export const products = [
   {
     id: "m1-spinning-reel",
-    name: "HANDING M1 Spinning Reel",
+    name: "Aorace M1 Spinning Reel",
     price: "$22.99 USD",
     amount: 22.99,
     colors: 1,
@@ -541,7 +697,7 @@ export const products = [
   },
   {
     id: "m1-elite-spinning-reel",
-    name: "HANDING M1 Elite Spinning Reel",
+    name: "Aorace M1 Elite Spinning Reel",
     price: "$33.99 USD",
     amount: 33.99,
     colors: 2,
@@ -606,7 +762,7 @@ export const products = [
   },
   {
     id: "m1-travel-casting-rod",
-    name: "HANDING M1 Travel Casting Rod",
+    name: "Aorace M1 Travel Casting Rod",
     price: "$62.99 USD",
     amount: 62.99,
     colors: 1,
@@ -619,7 +775,7 @@ export const products = [
   },
   {
     id: "m1-trout-casting-rod",
-    name: "HANDING M1 Trout Ultralight Two Pieces Casting Rod",
+    name: "Aorace M1 Trout Ultralight Two Pieces Casting Rod",
     price: "$57.79 USD",
     amount: 57.79,
     oldPrice: "$67.99 USD",
@@ -636,7 +792,7 @@ export const products = [
 export const rodProducts = [
   {
     id: "m1-travel-casting-rod",
-    name: "HANDING M1 Travel Casting Rod",
+    name: "Aorace M1 Travel Casting Rod",
     amount: 62.99,
     compareAtAmount: null,
     category: "casting",
@@ -650,7 +806,7 @@ export const rodProducts = [
   },
   {
     id: "m1-trout-casting-rod",
-    name: "HANDING M1 Trout Ultralight Two Pieces Casting Rod",
+    name: "Aorace M1 Trout Ultralight Two Pieces Casting Rod",
     amount: 57.79,
     compareAtAmount: 67.99,
     category: "casting",
@@ -751,7 +907,7 @@ export const rodProducts = [
 export const reelProducts = [
   {
     id: "m1-spinning-reel",
-    name: "HANDING M1 Spinning Reel",
+    name: "Aorace M1 Spinning Reel",
     amount: 22.99,
     compareAtAmount: null,
     category: "spinning",
@@ -772,7 +928,7 @@ export const reelProducts = [
   },
   {
     id: "m1-elite-spinning-reel",
-    name: "HANDING M1 Elite Spinning Reel",
+    name: "Aorace M1 Elite Spinning Reel",
     amount: 33.99,
     compareAtAmount: null,
     category: "spinning",

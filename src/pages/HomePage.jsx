@@ -81,7 +81,7 @@ function AboutSection({ t }) {
         <p className="kicker">{t.aboutTitle}</p>
         <h2>{t.aboutTitle}</h2>
         <p>{t.aboutBody}</p>
-        <Link className="button dark" to="/#about">{t.learn}</Link>
+        <Link className="button dark" to="/about">{t.learn}</Link>
       </div>
     </section>
   );

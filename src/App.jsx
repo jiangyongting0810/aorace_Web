@@ -7,6 +7,7 @@ import { Footer } from "./components/Footer.jsx";
 import { Header } from "./components/Header.jsx";
 import { AppRouter } from "./router.jsx";
 import { SearchOverlay } from "./components/SearchOverlay.jsx";
+import { AboutUsPage } from "./pages/AboutUsPage.jsx";
 import { FishingRodsPage } from "./pages/FishingRodsPage.jsx";
 import { FishingReelsPage } from "./pages/FishingReelsPage.jsx";
 import { HomePage } from "./pages/HomePage.jsx";
@@ -21,7 +22,7 @@ function ScrollEffects() {
   useEffect(() => {
     const updateHeaderState = () => {
       const header = document.querySelector(".site-header");
-      const hero = document.querySelector(".hero, .rods-hero, .reels-hero");
+      const hero = document.querySelector(".hero, .rods-hero, .reels-hero, .about-hero");
       if (!header || !hero) return;
       const threshold = hero.offsetTop + hero.offsetHeight / 2;
       header.classList.toggle("is-pinned", window.scrollY >= threshold);
@@ -107,7 +108,7 @@ function AppShell() {
     },
     { key: "lures", label: t.nav[3], href: "/#best-sellers" },
     { key: "sale", label: t.nav[4], href: "/#best-sellers" },
-    { key: "about", label: t.nav[5], href: "/#about" },
+    { key: "about", label: t.nav[5], href: "/about" },
     { key: "support", label: t.nav[6], href: "/#support" },
   ], [t]);
 
@@ -167,6 +168,7 @@ function AppShell() {
       />
       <Routes>
         <Route path="/" element={<HomePage t={t} lang={lang} addToCart={addToCart} />} />
+        <Route path="/about" element={<AboutUsPage t={t} />} />
         <Route path="/collections/fishing-rods" element={<FishingRodsPage t={t} lang={lang} addToCart={addToCart} />} />
         <Route path="/collections/fishing-reels" element={<FishingReelsPage t={t} lang={lang} addToCart={addToCart} />} />
         <Route path="/products/:productId" element={<ProductDetailPage t={t} addToCart={addToCart} />} />

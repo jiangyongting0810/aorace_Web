@@ -44,7 +44,7 @@ describe("FishWeb React app", () => {
     window.history.pushState({}, "", "/products/m1-travel-casting-rod");
     render(<App />);
 
-    expect(screen.getByRole("heading", { name: "HANDING M1 Travel Casting Rod" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Aorace M1 Travel Casting Rod" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "+ Quick add" })).toBeInTheDocument();
   });
 
@@ -82,6 +82,25 @@ describe("FishWeb React app", () => {
     expect(screen.getByText(/Spinning reels are easier for beginners/i)).toBeInTheDocument();
   });
 
+  test("renders the about page and switches timeline milestones", async () => {
+    const user = userEvent.setup();
+    window.history.pushState({}, "", "/about");
+    render(<App />);
+
+    expect(screen.getByRole("heading", { name: "About Aorace Fishing" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "We are Trust Worthy" })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("tab", { name: "2020" }));
+
+    expect(
+      screen.getAllByRole("heading", { name: "30,000 square meter industrial park" }).length
+    ).toBeGreaterThan(0);
+    expect(screen.getByRole("link", { name: "Shop Aorace Fishing Gear" })).toHaveAttribute(
+      "href",
+      "/collections/fishing-rods"
+    );
+  });
+
   test("requires reel quick add selections before adding to cart", async () => {
     const user = userEvent.setup();
     window.history.pushState({}, "", "/collections/fishing-reels");
@@ -89,7 +108,7 @@ describe("FishWeb React app", () => {
 
     await user.click(screen.getAllByRole("button", { name: "+ Quick add" })[0]);
 
-    expect(screen.getByRole("heading", { name: "HANDING M1 Spinning Reel" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Aorace M1 Spinning Reel" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Add to cart" }));
     expect(screen.getByText("Please choose both side and size.")).toBeInTheDocument();
 
