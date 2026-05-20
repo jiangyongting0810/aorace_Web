@@ -14,7 +14,7 @@ export function SearchOverlay({ t, lang, searchOpen, setSearchOpen }) {
 
     const categoryResults = categories
       .filter((category) => [category.en, category.zh].some((label) => label.toLowerCase().includes(normalizedQuery)))
-      .map((category) => ({ type: t.categoriesTitle, label: lang === "en" ? category.en : category.zh, to: category.href || "/#best-sellers" }));
+      .map((category) => ({ type: t.categoriesTitle, label: lang === "en" ? category.en : category.zh, to: category.href || "/?scroll=best-sellers" }));
 
     const blogResults = blogs
       .filter((blog) => [blog.title, blog.zh].some((label) => label.toLowerCase().includes(normalizedQuery)))

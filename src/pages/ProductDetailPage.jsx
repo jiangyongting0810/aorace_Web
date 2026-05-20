@@ -22,7 +22,7 @@ export function ProductDetailPage({ t, addToCart }) {
           <img src={product.image} alt={product.name} />
         </div>
         <section className="detail-copy">
-          <Link className="detail-back" to="/#best-sellers">← {t.bestTitle}</Link>
+          <Link className="detail-back" to="/?scroll=best-sellers">← {t.bestTitle}</Link>
           <h1>{product.name}</h1>
           <p className="price-line">
             {`${t.from} ${product.price}`}

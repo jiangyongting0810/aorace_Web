@@ -49,12 +49,12 @@ export function CartDrawer({
           >
             {t.checkout}
           </button>
-          <Link to="/#best-sellers" onClick={() => setCartOpen(false)}>{t.continue}</Link>
+          <Link to="/?scroll=best-sellers" onClick={() => setCartOpen(false)}>{t.continue}</Link>
         </>
       ) : (
         <>
           <p>{t.empty}</p>
-          <Link to="/#best-sellers" onClick={() => setCartOpen(false)}>{t.continue}</Link>
+          <Link to="/?scroll=best-sellers" onClick={() => setCartOpen(false)}>{t.continue}</Link>
         </>
       )}
     </aside>

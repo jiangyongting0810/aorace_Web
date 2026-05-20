@@ -671,13 +671,13 @@ export const categories = [
     en: "Fishing Lures",
     zh: "\u62df\u9975",
     image: "https://images.unsplash.com/photo-1524704654690-b56c05c78a00?auto=format&fit=crop&w=900&q=80",
-    href: "/#best-sellers",
+    href: "/?scroll=best-sellers",
   },
   {
     en: "Fishing Lines",
     zh: "\u9c7c\u7ebf",
     image: "https://images.unsplash.com/photo-1529230117010-b6c436154f25?auto=format&fit=crop&w=900&q=80",
-    href: "/#best-sellers",
+    href: "/?scroll=best-sellers",
   },
 ];
 

@@ -10,7 +10,7 @@ export function Footer({ t, navItems }) {
       <div>
         <h3>{t.footerExplore}</h3>
         {navItems.slice(0, 5).map((item) => (
-          <SmartLink href={item.href || "/#best-sellers"} key={item.key}>{item.label}</SmartLink>
+          <SmartLink href={item.href || "/?scroll=best-sellers"} key={item.key}>{item.label}</SmartLink>
         ))}
       </div>
       <div>

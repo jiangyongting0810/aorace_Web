@@ -39,6 +39,21 @@ function ScrollEffects() {
   }, [location.pathname]);
 
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const scrollTarget = params.get("scroll");
+
+    if (scrollTarget) {
+      window.requestAnimationFrame(() => {
+        document.getElementById(scrollTarget)?.scrollIntoView({ behavior: "smooth" });
+      });
+
+      params.delete("scroll");
+      const nextSearch = params.toString();
+      const nextUrl = `${location.pathname}${nextSearch ? `?${nextSearch}` : ""}${location.hash}`;
+      window.history.replaceState(window.history.state, "", nextUrl);
+      return;
+    }
+
     if (!location.hash) {
       window.scrollTo({ top: 0, behavior: "instant" });
       return;
@@ -47,7 +62,7 @@ function ScrollEffects() {
     window.requestAnimationFrame(() => {
       document.querySelector(location.hash)?.scrollIntoView({ behavior: "smooth" });
     });
-  }, [location.pathname, location.hash]);
+  }, [location.pathname, location.hash, location.search]);
 
   return null;
 }
@@ -106,8 +121,8 @@ function AppShell() {
         },
       },
     },
-    { key: "lures", label: t.nav[3], href: "/#best-sellers" },
-    { key: "sale", label: t.nav[4], href: "/#best-sellers" },
+    { key: "lures", label: t.nav[3], href: "/?scroll=best-sellers" },
+    { key: "sale", label: t.nav[4], href: "/?scroll=best-sellers" },
     { key: "about", label: t.nav[5], href: "/about" },
     { key: "support", label: t.nav[6], href: "/#support" },
   ], [t]);

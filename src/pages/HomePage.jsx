@@ -15,7 +15,7 @@ function CategorySection({ t, lang }) {
       <h2>{t.categoriesTitle}</h2>
       <div className="category-grid">
         {categories.slice(0, 3).map((category) => (
-          <Link to={category.href || "/#best-sellers"} className="category-card" key={category.en}>
+          <Link to={category.href || "/?scroll=best-sellers"} className="category-card" key={category.en}>
             <div className="category-image">
               <img src={category.image} alt={category.en} />
               <div className="category-overlay">
@@ -116,7 +116,7 @@ function Testimonials({ t }) {
     <section className="section testimonials">
       <div className="section-title-row">
         <h2>{t.testimonials}</h2>
-        <Link to="/#best-sellers">{t.viewAll}</Link>
+        <Link to="/?scroll=best-sellers">{t.viewAll}</Link>
       </div>
       <div className="review-grid">
         {reviews.map(([name, title, body]) => (
