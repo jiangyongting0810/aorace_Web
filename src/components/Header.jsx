@@ -26,7 +26,7 @@ function MegaMenuPanel({ menu, closeMegaMenu }) {
         </div>
       </div>
       <SmartLink href={menu.feature.href} className="mega-menu-media" onClick={closeMegaMenu}>
-        <img src={assets.categoryRods} alt={menu.feature.alt} />
+        <img src={menu.feature.image || assets.categoryRods} alt={menu.feature.alt} />
         <div className="mega-menu-media-copy">
           <span>{menu.feature.eyebrow}</span>
           <strong>{menu.feature.title}</strong>
@@ -48,10 +48,11 @@ export function Header({
   mobileNavOpen,
   setMobileNavOpen,
 }) {
-  const [megaMenuOpen, setMegaMenuOpen] = useState(false);
-  const [mobileRodsOpen, setMobileRodsOpen] = useState(false);
+  const [activeMegaMenuKey, setActiveMegaMenuKey] = useState(null);
+  const [mobileOpenKey, setMobileOpenKey] = useState(null);
   const openTimer = useRef(null);
   const closeTimer = useRef(null);
+  const pendingMegaMenuKey = useRef(null);
   const hoverDelay = 180;
 
   useEffect(() => () => {
@@ -59,32 +60,35 @@ export function Header({
     window.clearTimeout(closeTimer.current);
   }, []);
 
-  const scheduleMegaMenuOpen = () => {
+  const scheduleMegaMenuOpen = (key) => {
     window.clearTimeout(closeTimer.current);
     window.clearTimeout(openTimer.current);
-    openTimer.current = window.setTimeout(() => setMegaMenuOpen(true), hoverDelay);
+    pendingMegaMenuKey.current = key;
+    openTimer.current = window.setTimeout(() => setActiveMegaMenuKey(pendingMegaMenuKey.current), hoverDelay);
   };
 
   const scheduleMegaMenuClose = () => {
     window.clearTimeout(openTimer.current);
     window.clearTimeout(closeTimer.current);
-    closeTimer.current = window.setTimeout(() => setMegaMenuOpen(false), hoverDelay);
+    pendingMegaMenuKey.current = null;
+    closeTimer.current = window.setTimeout(() => setActiveMegaMenuKey(null), hoverDelay);
   };
 
   const closeMegaMenuImmediately = () => {
     window.clearTimeout(openTimer.current);
     window.clearTimeout(closeTimer.current);
-    setMegaMenuOpen(false);
+    pendingMegaMenuKey.current = null;
+    setActiveMegaMenuKey(null);
   };
 
   const closeMobileNav = () => {
     setMobileNavOpen(false);
-    setMobileRodsOpen(false);
+    setMobileOpenKey(null);
   };
 
   const openMobileNav = () => {
     closeMegaMenuImmediately();
-    setMobileRodsOpen(false);
+    setMobileOpenKey(null);
     setMobileNavOpen(true);
   };
 
@@ -99,15 +103,15 @@ export function Header({
           <nav className="main-nav" aria-label="Main menu">
             {navItems.map((item) => item.megaMenu ? (
               <div
-                className={megaMenuOpen ? "nav-item has-mega open" : "nav-item has-mega"}
+                className={activeMegaMenuKey === item.key ? "nav-item has-mega open" : "nav-item has-mega"}
                 key={item.key}
-                onMouseEnter={scheduleMegaMenuOpen}
+                onMouseEnter={() => scheduleMegaMenuOpen(item.key)}
                 onMouseLeave={scheduleMegaMenuClose}
               >
                 <button
                   type="button"
                   className="nav-trigger"
-                  aria-expanded={megaMenuOpen}
+                  aria-expanded={activeMegaMenuKey === item.key}
                   aria-haspopup="true"
                 >
                   {item.label}
@@ -124,7 +128,7 @@ export function Header({
             <button
               className={lang === "en" ? "lang-button show-en" : "lang-button show-zh"}
               onClick={() => setLang(otherLang)}
-              aria-label={lang === "en" ? "切换到中文" : "Switch to English"}
+              aria-label={lang === "en" ? "Switch to Chinese" : "Switch to English"}
             >
               <span className="lang-track" aria-hidden="true" />
               <span className="lang-label en">EN</span>
@@ -148,14 +152,14 @@ export function Header({
             <div className="mobile-nav-item has-children" key={item.key}>
               <button
                 type="button"
-                className={mobileRodsOpen ? "mobile-nav-toggle open" : "mobile-nav-toggle"}
-                aria-expanded={mobileRodsOpen}
-                onClick={() => setMobileRodsOpen((open) => !open)}
+                className={mobileOpenKey === item.key ? "mobile-nav-toggle open" : "mobile-nav-toggle"}
+                aria-expanded={mobileOpenKey === item.key}
+                onClick={() => setMobileOpenKey((current) => current === item.key ? null : item.key)}
               >
                 <span>{item.label}</span>
                 <span className="mobile-chevron" aria-hidden="true">⌄</span>
               </button>
-              <div className={mobileRodsOpen ? "mobile-submenu open" : "mobile-submenu"}>
+              <div className={mobileOpenKey === item.key ? "mobile-submenu open" : "mobile-submenu"}>
                 <div className="mobile-submenu-inner">
                   <SmartLink href={item.megaMenu.headingHref} className="mobile-submenu-primary" onClick={closeMobileNav}>
                     {item.megaMenu.heading}

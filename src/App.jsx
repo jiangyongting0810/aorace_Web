@@ -8,10 +8,11 @@ import { Header } from "./components/Header.jsx";
 import { AppRouter } from "./router.jsx";
 import { SearchOverlay } from "./components/SearchOverlay.jsx";
 import { FishingRodsPage } from "./pages/FishingRodsPage.jsx";
+import { FishingReelsPage } from "./pages/FishingReelsPage.jsx";
 import { HomePage } from "./pages/HomePage.jsx";
 import { ProductDetailPage } from "./pages/ProductDetailPage.jsx";
 import { StoryDetailPage } from "./pages/StoryDetailPage.jsx";
-import { copy } from "./data/content.js";
+import { assets, copy } from "./data/content.js";
 import { useLocalStorageState } from "./hooks/useLocalStorageState.js";
 
 function ScrollEffects() {
@@ -20,7 +21,7 @@ function ScrollEffects() {
   useEffect(() => {
     const updateHeaderState = () => {
       const header = document.querySelector(".site-header");
-      const hero = document.querySelector(".hero, .rods-hero");
+      const hero = document.querySelector(".hero, .rods-hero, .reels-hero");
       if (!header || !hero) return;
       const threshold = hero.offsetTop + hero.offsetHeight / 2;
       header.classList.toggle("is-pinned", window.scrollY >= threshold);
@@ -69,21 +70,41 @@ function AppShell() {
       label: t.nav[1],
       href: "/collections/fishing-rods",
       megaMenu: {
-        heading: t.megaMenu.allRods,
+        heading: (t.megaMenuRods || t.megaMenu).allRods,
         headingHref: "/collections/fishing-rods",
         links: [
-          { key: "spinning", label: t.megaMenu.spinningRods, href: "/collections/fishing-rods" },
-          { key: "casting", label: t.megaMenu.castingRods, href: "/collections/fishing-rods" },
+          { key: "spinning", label: (t.megaMenuRods || t.megaMenu).spinningRods, href: "/collections/fishing-rods" },
+          { key: "casting", label: (t.megaMenuRods || t.megaMenu).castingRods, href: "/collections/fishing-rods" },
         ],
         feature: {
           href: "/collections/fishing-rods",
-          alt: t.megaMenu.featuredAlt,
-          eyebrow: t.megaMenu.featuredEyebrow,
-          title: t.megaMenu.featuredTitle,
+          image: assets.categoryRods,
+          alt: (t.megaMenuRods || t.megaMenu).featuredAlt,
+          eyebrow: (t.megaMenuRods || t.megaMenu).featuredEyebrow,
+          title: (t.megaMenuRods || t.megaMenu).featuredTitle,
         },
       },
     },
-    { key: "reels", label: t.nav[2], href: "/#best-sellers" },
+    {
+      key: "reels",
+      label: t.nav[2],
+      href: "/collections/fishing-reels",
+      megaMenu: {
+        heading: t.megaMenuReels.allReels,
+        headingHref: "/collections/fishing-reels",
+        links: [
+          { key: "spinning", label: t.megaMenuReels.spinningReels, href: "/collections/fishing-reels" },
+          { key: "casting", label: t.megaMenuReels.castingReels, href: "/collections/fishing-reels" },
+        ],
+        feature: {
+          href: "/collections/fishing-reels",
+          image: assets.categoryReels,
+          alt: t.megaMenuReels.featuredAlt,
+          eyebrow: t.megaMenuReels.featuredEyebrow,
+          title: t.megaMenuReels.featuredTitle,
+        },
+      },
+    },
     { key: "lures", label: t.nav[3], href: "/#best-sellers" },
     { key: "sale", label: t.nav[4], href: "/#best-sellers" },
     { key: "about", label: t.nav[5], href: "/#about" },
@@ -147,6 +168,7 @@ function AppShell() {
       <Routes>
         <Route path="/" element={<HomePage t={t} lang={lang} addToCart={addToCart} />} />
         <Route path="/collections/fishing-rods" element={<FishingRodsPage t={t} lang={lang} addToCart={addToCart} />} />
+        <Route path="/collections/fishing-reels" element={<FishingReelsPage t={t} lang={lang} addToCart={addToCart} />} />
         <Route path="/products/:productId" element={<ProductDetailPage t={t} addToCart={addToCart} />} />
         <Route path="/stories/:slug" element={<StoryDetailPage t={t} lang={lang} />} />
         <Route path="*" element={<Navigate to="/" replace />} />

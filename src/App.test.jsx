@@ -21,7 +21,7 @@ describe("FishWeb React app", () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getByRole("button", { name: "切换到中文" }));
+    await user.click(screen.getByRole("button", { name: /switch to chinese/i }));
 
     expect(screen.getByText("订单满 $50 免运费")).toBeInTheDocument();
     expect(window.localStorage.getItem("tideforge-lang")).toBe("\"zh\"");
@@ -59,5 +59,18 @@ describe("FishWeb React app", () => {
 
     expect(screen.getByRole("button", { name: "Best selling" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Price, high to low" })).toBeInTheDocument();
+  });
+
+  test("renders the fishing reels collection page and opens sorting options", async () => {
+    const user = userEvent.setup();
+    window.history.pushState({}, "", "/collections/fishing-reels");
+    render(<App />);
+
+    expect(screen.getByRole("heading", { name: "Fishing Reels" })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /Sort by:/i }));
+
+    expect(screen.getByRole("button", { name: "Best selling" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Price, low to high" })).toBeInTheDocument();
   });
 });

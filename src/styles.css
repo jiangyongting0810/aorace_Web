@@ -578,7 +578,8 @@ img {
   padding-left: 0;
 }
 
-.rods-hero {
+.rods-hero,
+.reels-hero {
   position: relative;
   display: grid;
   place-items: center;
@@ -588,6 +589,12 @@ img {
   background:
     linear-gradient(180deg, rgba(6, 10, 14, 0.28) 0%, rgba(6, 10, 14, 0.7) 100%),
     url("./assets/category-rods.jpg") center 36% / cover no-repeat;
+}
+
+.reels-hero {
+  background:
+    linear-gradient(180deg, rgba(6, 10, 14, 0.28) 0%, rgba(6, 10, 14, 0.7) 100%),
+    url("./assets/category-reels.webp") center 46% / cover no-repeat;
 }
 
 .rods-hero-overlay {
@@ -2227,7 +2234,8 @@ img {
     background: #0f1110;
   }
 
-  .rods-hero {
+  .rods-hero,
+  .reels-hero {
     min-height: 320px;
     background-position: 58% center;
   }

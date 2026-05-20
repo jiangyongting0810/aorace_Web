@@ -15,7 +15,7 @@ function CategorySection({ t, lang }) {
       <h2>{t.categoriesTitle}</h2>
       <div className="category-grid">
         {categories.slice(0, 3).map((category) => (
-          <Link to={category.en === "Fishing Rods" ? "/collections/fishing-rods" : "/#best-sellers"} className="category-card" key={category.en}>
+          <Link to={category.href || "/#best-sellers"} className="category-card" key={category.en}>
             <div className="category-image">
               <img src={category.image} alt={category.en} />
               <div className="category-overlay">
