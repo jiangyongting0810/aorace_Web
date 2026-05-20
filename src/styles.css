@@ -1267,7 +1267,9 @@ img {
 .reel-quick-add-panel {
   position: relative;
   width: min(560px, 100%);
+  max-height: min(760px, calc(100vh - 48px));
   padding: 28px;
+  overflow-y: auto;
   background: var(--white);
   box-shadow: var(--shadow);
 }
@@ -1346,6 +1348,7 @@ img {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
+  margin-top: 8px;
 }
 
 .filter-drawer-overlay {
@@ -2580,11 +2583,22 @@ img {
   .reel-quick-add-panel {
     width: 100%;
     min-height: 100vh;
-    padding: 24px 16px 28px;
+    max-height: 100vh;
+    padding: 24px 16px calc(28px + env(safe-area-inset-bottom, 0px));
+    border-radius: 0;
   }
 
   .reel-quick-add-panel h2 {
     font-size: 26px;
+  }
+
+  .reel-quick-add-copy {
+    line-height: 1.65;
+  }
+
+  .reel-quick-add-close {
+    top: 12px;
+    right: 12px;
   }
 
   .reel-quick-add-actions {

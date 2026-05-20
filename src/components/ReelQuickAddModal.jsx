@@ -28,7 +28,14 @@ export function ReelQuickAddModal({ product, reelsCopy, open, onClose, onConfirm
   return (
     <div className={open ? "reel-quick-add-modal open" : "reel-quick-add-modal"} onClick={onClose}>
       <div className="reel-quick-add-panel" onClick={(event) => event.stopPropagation()}>
-        <button type="button" className="reel-quick-add-close" onClick={onClose}>×</button>
+        <button
+          type="button"
+          className="reel-quick-add-close"
+          aria-label={reelsCopy.quickAddCancel}
+          onClick={onClose}
+        >
+          ×
+        </button>
         <p className="reel-quick-add-kicker">{reelsCopy.quickAddTitle}</p>
         <h2>{product.name}</h2>
         <p className="reel-quick-add-copy">{reelsCopy.quickAddBody}</p>
