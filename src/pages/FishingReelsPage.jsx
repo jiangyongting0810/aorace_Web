@@ -1,5 +1,8 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { ReelsFAQ } from "../components/ReelsFAQ.jsx";
+import { ReelQuickAddModal } from "../components/ReelQuickAddModal.jsx";
+import { ReelsSEOContent } from "../components/ReelsSEOContent.jsx";
 import { reelCategories, reelProducts, reelSizes } from "../data/content.js";
 import { formatMoney } from "../utils/format.js";
 
@@ -127,10 +130,10 @@ function FilterSidebar({
         {reelSizes.map((item) => (
           <FilterCheckbox
             key={item.value}
-            checked={selectedSizes.includes(item.value)}
+            checked={selectedSizes.includes(String(item.value))}
             label={lang === "en" ? item.en : item.zh}
             count={sizeCounts[item.value]}
-            onChange={() => toggleSize(item.value)}
+            onChange={() => toggleSize(String(item.value))}
           />
         ))}
       </AccordionFilter>
@@ -138,21 +141,22 @@ function FilterSidebar({
   );
 }
 
-function ReelCard({ product, reelsCopy, t, addToCart }) {
-  const cartProduct = {
-    ...product,
-    amount: product.amount,
-  };
-
+function ReelCard({ product, reelsCopy, t, openQuickAdd }) {
   return (
-    <article className="rod-card">
-      <Link to={`/products/${product.id}`} className="rod-card-media">
+    <article className="rod-card reel-card">
+      <Link to={`/products/${product.id}`} className="rod-card-media reel-card-media">
         {product.compareAtAmount && <span className="rod-badge sale">{reelsCopy.onSale}</span>}
         {product.discountPercent && <span className="rod-badge discount">{`${product.discountPercent}% OFF`}</span>}
-        <img src={product.image} alt={product.name} />
+        <div className={product.secondaryImageMode === "detail" ? "reel-card-images detail-mode" : "reel-card-images"}>
+          <img className="reel-image primary" src={product.primaryImage} alt={product.name} />
+          <img className="reel-image secondary" src={product.secondaryImage || product.primaryImage} alt={`${product.name} detail`} />
+        </div>
       </Link>
-      <div className="rod-card-body">
+      <div className="rod-card-body reel-card-body">
         <Link to={`/products/${product.id}`} className="rod-card-title">{product.name}</Link>
+        <small className="reel-variant-hint">
+          {product.variantHint === "multiple" ? reelsCopy.variantMultiple : reelsCopy.variantSingle}
+        </small>
         <p className={product.compareAtAmount ? "rod-card-price sale" : "rod-card-price"}>
           <span>{`${reelsCopy.pricePrefix} ${formatMoney(product.amount)}`}</span>
           {product.compareAtAmount && <del>{formatMoney(product.compareAtAmount)}</del>}
@@ -161,7 +165,7 @@ function ReelCard({ product, reelsCopy, t, addToCart }) {
           <span className="rod-stars" aria-hidden="true">★★★★★</span>
           <span>{`${product.rating} (${product.reviews} ${reelsCopy.reviews})`}</span>
         </div>
-        <button type="button" className="quick-add-button rod-quick-add" onClick={() => addToCart(cartProduct)}>
+        <button type="button" className="quick-add-button rod-quick-add" onClick={() => openQuickAdd(product)}>
           {t.quick}
         </button>
       </div>
@@ -182,6 +186,7 @@ export function FishingReelsPage({ t, lang, addToCart }) {
     categories: true,
     sizes: true,
   });
+  const [quickAddProduct, setQuickAddProduct] = useState(null);
 
   const sortOptions = useMemo(() => ([
     { value: "featured", label: reelsCopy.sortFeatured },
@@ -198,7 +203,7 @@ export function FishingReelsPage({ t, lang, addToCart }) {
   );
 
   const sizeCounts = useMemo(
-    () => reelSizes.reduce((acc, item) => ({ ...acc, [item.value]: reelProducts.filter((product) => product.size === item.value).length }), {}),
+    () => reelSizes.reduce((acc, item) => ({ ...acc, [item.value]: reelProducts.filter((product) => product.sizeOptions.includes(String(item.value))).length }), {}),
     []
   );
 
@@ -207,7 +212,7 @@ export function FishingReelsPage({ t, lang, addToCart }) {
       if (inStockOnly && !product.inStock) return false;
       if (product.amount < priceRange[0] || product.amount > priceRange[1]) return false;
       if (selectedCategories.length && !selectedCategories.includes(product.category)) return false;
-      if (selectedSizes.length && !selectedSizes.includes(product.size)) return false;
+      if (selectedSizes.length && !selectedSizes.some((size) => product.sizeOptions.includes(size))) return false;
       return true;
     });
 
@@ -245,6 +250,19 @@ export function FishingReelsPage({ t, lang, addToCart }) {
 
   const togglePanel = (panel) => {
     setOpenPanels((current) => ({ ...current, [panel]: !current[panel] }));
+  };
+
+  const confirmQuickAdd = ({ hand, size }) => {
+    const option = `${hand} / ${size}`;
+    addToCart(
+      {
+        ...quickAddProduct,
+        image: quickAddProduct.primaryImage,
+        options: [option],
+      },
+      option
+    );
+    setQuickAddProduct(null);
   };
 
   return (
@@ -326,7 +344,13 @@ export function FishingReelsPage({ t, lang, addToCart }) {
               <div className="rods-grid">
                 {filteredProducts.length ? (
                   filteredProducts.map((product) => (
-                    <ReelCard key={product.id} product={product} reelsCopy={reelsCopy} t={t} addToCart={addToCart} />
+                    <ReelCard
+                      key={product.id}
+                      product={product}
+                      reelsCopy={reelsCopy}
+                      t={t}
+                      openQuickAdd={setQuickAddProduct}
+                    />
                   ))
                 ) : (
                   <div className="rods-empty">{reelsCopy.empty}</div>
@@ -336,6 +360,9 @@ export function FishingReelsPage({ t, lang, addToCart }) {
           </div>
         </div>
       </section>
+
+      <ReelsFAQ title={reelsCopy.faqTitle} intro={reelsCopy.faqIntro} items={reelsCopy.faq} />
+      <ReelsSEOContent title={reelsCopy.seoTitle} content={reelsCopy.seoContent} />
 
       <div className={mobileFilterOpen ? "filter-drawer-overlay open" : "filter-drawer-overlay"} onClick={() => setMobileFilterOpen(false)} />
       <aside className={mobileFilterOpen ? "filter-drawer open" : "filter-drawer"}>
@@ -363,6 +390,14 @@ export function FishingReelsPage({ t, lang, addToCart }) {
           {reelsCopy.applyFilters}
         </button>
       </aside>
+
+      <ReelQuickAddModal
+        product={quickAddProduct}
+        reelsCopy={reelsCopy}
+        open={Boolean(quickAddProduct)}
+        onClose={() => setQuickAddProduct(null)}
+        onConfirm={confirmQuickAdd}
+      />
     </main>
   );
 }

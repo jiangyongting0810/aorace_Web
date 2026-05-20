@@ -27,7 +27,7 @@ describe("FishWeb React app", () => {
     expect(window.localStorage.getItem("tideforge-lang")).toBe("\"zh\"");
   });
 
-  test("adds a product to cart and persists cart state", async () => {
+  test("adds a home page product to cart and persists cart state", async () => {
     const user = userEvent.setup();
     render(<App />);
 
@@ -61,16 +61,45 @@ describe("FishWeb React app", () => {
     expect(screen.getByRole("button", { name: "Price, high to low" })).toBeInTheDocument();
   });
 
-  test("renders the fishing reels collection page and opens sorting options", async () => {
+  test("renders the fishing reels collection page with faq and seo content", async () => {
     const user = userEvent.setup();
     window.history.pushState({}, "", "/collections/fishing-reels");
     render(<App />);
 
     expect(screen.getByRole("heading", { name: "Fishing Reels" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Reel Buying Questions" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Fishing reel guide and selection advice" })).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: /Sort by:/i }));
+    const firstQuestion = screen.getByRole("button", { name: "How do I choose the right reel size?" });
+    const secondQuestion = screen.getByRole("button", { name: "What is the difference between spinning and casting reels?" });
 
-    expect(screen.getByRole("button", { name: "Best selling" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Price, low to high" })).toBeInTheDocument();
+    await user.click(firstQuestion);
+    expect(firstQuestion).toHaveAttribute("aria-expanded", "true");
+
+    await user.click(secondQuestion);
+    expect(firstQuestion).toHaveAttribute("aria-expanded", "false");
+    expect(secondQuestion).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByText(/Spinning reels are easier for beginners/i)).toBeInTheDocument();
+  });
+
+  test("requires reel quick add selections before adding to cart", async () => {
+    const user = userEvent.setup();
+    window.history.pushState({}, "", "/collections/fishing-reels");
+    render(<App />);
+
+    await user.click(screen.getAllByRole("button", { name: "+ Quick add" })[0]);
+
+    expect(screen.getByRole("heading", { name: "HANDING M1 Spinning Reel" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Add to cart" }));
+    expect(screen.getByText("Please choose both side and size.")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Right" }));
+    await user.click(screen.getByRole("button", { name: "4000" }));
+    await user.click(screen.getByRole("button", { name: "Add to cart" }));
+
+    expect(screen.getByRole("heading", { name: "Cart" })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(window.localStorage.getItem("tideforge-cart")).toContain("Right / 4000");
+    });
   });
 });

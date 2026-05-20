@@ -978,7 +978,13 @@ img {
   overflow: hidden;
   border: 1px solid #ededed;
   background: var(--white);
-  transition: all 200ms ease;
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+
+.reel-card:hover {
+  border-color: rgba(17, 17, 17, 0.08);
+  box-shadow: 0 18px 34px rgba(17, 17, 17, 0.11);
+  transform: translateY(-4px);
 }
 
 .rod-card-media {
@@ -988,6 +994,12 @@ img {
   aspect-ratio: 3 / 4;
   overflow: hidden;
   background: #f6f6f6;
+}
+
+.reel-card-images {
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 .rod-card-media img {
@@ -1002,10 +1014,42 @@ img {
   transform: scale(1.03);
 }
 
+.reel-card-media .reel-image {
+  position: absolute;
+  inset: 0;
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 280ms ease, transform 280ms ease;
+}
+
+.reel-card-media .reel-image.secondary {
+  opacity: 0;
+}
+
+.reel-card-images.detail-mode .reel-image.secondary {
+  object-fit: cover;
+  object-position: 56% 42%;
+  transform: scale(1.24);
+  padding: 0;
+}
+
+.reel-card:hover .reel-image.primary {
+  opacity: 0;
+  transform: scale(1.02);
+}
+
+.reel-card:hover .reel-image.secondary {
+  opacity: 1;
+}
+
 .rod-card-body {
   display: grid;
   gap: 10px;
   padding: 18px 18px 20px;
+}
+
+.reel-card-body {
+  gap: 8px;
 }
 
 .rod-badge {
@@ -1079,12 +1123,229 @@ img {
   margin-top: 2px;
 }
 
+.reel-variant-hint {
+  display: block;
+  margin-top: -2px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .rods-empty {
   grid-column: 1 / -1;
   padding: 28px;
   border: 1px dashed var(--line);
   color: var(--muted);
   text-align: center;
+}
+
+.reels-faq {
+  padding-top: 4px;
+}
+
+.reels-faq-shell {
+  width: 100%;
+}
+
+.reels-faq-header {
+  margin-bottom: 24px;
+}
+
+.reels-faq-header h2,
+.reels-seo-shell h2 {
+  margin: 0 0 10px;
+  font-size: clamp(30px, 4vw, 42px);
+  line-height: 1.08;
+}
+
+.reels-faq-header p,
+.reels-seo-shell p {
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.reels-faq-list {
+  display: grid;
+  gap: 12px;
+}
+
+.reels-faq-item {
+  border: 1px solid var(--line);
+  background: var(--white);
+}
+
+.reels-faq-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  width: 100%;
+  min-height: 72px;
+  padding: 0 22px;
+  border: 0;
+  background: transparent;
+  font-size: 16px;
+  font-weight: 800;
+  text-align: left;
+}
+
+.reels-faq-icon {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 24px;
+  line-height: 1;
+  transition: transform 300ms ease-in-out;
+}
+
+.reels-faq-item.open .reels-faq-icon {
+  transform: rotate(45deg);
+}
+
+.reels-faq-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 300ms ease-in-out;
+}
+
+.reels-faq-item.open .reels-faq-panel {
+  grid-template-rows: 1fr;
+}
+
+.reels-faq-panel-inner {
+  overflow: hidden;
+}
+
+.reels-faq-panel-inner p {
+  margin: 0;
+  padding: 0 22px 22px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.reels-seo {
+  padding-top: 10px;
+}
+
+.reels-seo-shell {
+  width: 100%;
+  color: #5f5f5f;
+}
+
+.reels-seo-block {
+  margin-top: 28px;
+}
+
+.reels-seo-shell h3 {
+  margin: 0 0 10px;
+  color: var(--ink);
+  font-size: 22px;
+}
+
+.reels-seo-shell ul {
+  margin: 12px 0 0;
+  padding-left: 22px;
+}
+
+.reels-seo-shell li {
+  margin-bottom: 10px;
+  line-height: 1.8;
+}
+
+.reel-quick-add-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 96;
+  display: none;
+  place-items: center;
+  padding: 24px;
+  background: rgba(17, 17, 17, 0.56);
+}
+
+.reel-quick-add-modal.open {
+  display: grid;
+}
+
+.reel-quick-add-panel {
+  position: relative;
+  width: min(560px, 100%);
+  padding: 28px;
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+
+.reel-quick-add-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: transparent;
+  font-size: 26px;
+  line-height: 1;
+}
+
+.reel-quick-add-kicker {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.reel-quick-add-panel h2 {
+  margin: 0 0 12px;
+  font-size: 30px;
+  line-height: 1.12;
+}
+
+.reel-quick-add-copy {
+  margin: 0 0 22px;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.reel-quick-add-group {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.reel-quick-add-group strong {
+  font-size: 14px;
+}
+
+.reel-quick-add-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.reel-choice,
+.reel-modal-secondary {
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  font-weight: 700;
+}
+
+.reel-choice.active {
+  border-color: var(--dark);
+  color: var(--white);
+  background: var(--dark);
+}
+
+.reel-quick-add-error {
+  margin: 0 0 14px;
+  color: var(--sale);
+  font-weight: 700;
+}
+
+.reel-quick-add-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
 .filter-drawer-overlay {
@@ -2144,6 +2405,11 @@ img {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .reels-faq-shell,
+  .reels-seo-shell {
+    width: 100%;
+  }
+
   .promo-grid,
   .checkout-grid,
   .detail-grid,
@@ -2295,6 +2561,34 @@ img {
   .rods-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
+  }
+
+  .reels-faq-trigger {
+    min-height: 64px;
+    padding: 0 18px;
+    font-size: 15px;
+  }
+
+  .reels-faq-panel-inner p {
+    padding: 0 18px 18px;
+  }
+
+  .reel-quick-add-modal {
+    padding: 0;
+  }
+
+  .reel-quick-add-panel {
+    width: 100%;
+    min-height: 100vh;
+    padding: 24px 16px 28px;
+  }
+
+  .reel-quick-add-panel h2 {
+    font-size: 26px;
+  }
+
+  .reel-quick-add-actions {
+    grid-template-columns: 1fr;
   }
 
   .rod-card-body {

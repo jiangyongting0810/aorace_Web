@@ -1,6 +1,5 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { resolve } from "node:path";
 
 export default defineConfig({
   plugins: [react()],
@@ -12,7 +11,7 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
-    setupFiles: [resolve("src/test/setup.js")],
+    setupFiles: ["src/test/setup.js"],
     globals: true,
   },
 });
