@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { submitOrder } from "../services/orders.js";
+import { submitOrder as submitOrderRequest } from "../services/orders.js";
 import { formatMoney } from "../utils/format.js";
 
 export function CheckoutModal({
@@ -9,8 +9,6 @@ export function CheckoutModal({
   checkoutOpen,
   setCheckoutOpen,
   setCartOpen,
-  orderResult,
-  setOrderResult,
   setCartItems,
 }) {
   const [form, setForm] = useState({
@@ -26,6 +24,7 @@ export function CheckoutModal({
   });
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
+  const [orderResult, setOrderResult] = useState(null);
 
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }));
 
@@ -36,7 +35,7 @@ export function CheckoutModal({
     if (orderResult) setOrderResult(null);
   };
 
-  const submitOrder = async (event) => {
+  const handleSubmitOrder = async (event) => {
     event.preventDefault();
     const required = ["email", "name", "phone", "address", "city", "state", "zip"];
     if (!cartItems.length || required.some((field) => !form[field].trim())) {
@@ -54,7 +53,7 @@ export function CheckoutModal({
     };
 
     try {
-      const data = await submitOrder(order);
+      const data = await submitOrderRequest(order);
       setOrderResult(data);
       setCartItems([]);
       setStatus("idle");
@@ -66,7 +65,7 @@ export function CheckoutModal({
 
   return (
     <div className={checkoutOpen ? "checkout-modal open" : "checkout-modal"}>
-      <form className="checkout-panel" onSubmit={submitOrder}>
+      <form className="checkout-panel" onSubmit={handleSubmitOrder}>
         <button type="button" className="drawer-close" onClick={close}>{t.close}</button>
         {orderResult ? (
           <div className="order-success">

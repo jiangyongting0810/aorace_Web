@@ -4,6 +4,7 @@ import { ReelsFAQ } from "../components/ReelsFAQ.jsx";
 import { ReelQuickAddModal } from "../components/ReelQuickAddModal.jsx";
 import { ReelsSEOContent } from "../components/ReelsSEOContent.jsx";
 import { reelCategories, reelProducts, reelSizes } from "../data/content.js";
+import { useCollectionFilters } from "../features/collections/useCollectionFilters.js";
 import { formatMoney } from "../utils/format.js";
 
 function FilterCheckbox({ checked, label, count, onChange }) {
@@ -175,16 +176,33 @@ function ReelCard({ product, reelsCopy, t, openQuickAdd }) {
 
 export function FishingReelsPage({ t, lang, addToCart }) {
   const reelsCopy = t.reelsPage || t.rodsPage;
-  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
-  const [sortOpen, setSortOpen] = useState(false);
-  const [sortBy, setSortBy] = useState("featured");
-  const [inStockOnly, setInStockOnly] = useState(false);
-  const [priceRange, setPriceRange] = useState([0, 150]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedSizes, setSelectedSizes] = useState([]);
-  const [openPanels, setOpenPanels] = useState({
-    categories: true,
-    sizes: true,
+  const {
+    mobileFilterOpen,
+    setMobileFilterOpen,
+    sortOpen,
+    setSortOpen,
+    sortBy,
+    setSortBy,
+    inStockOnly,
+    setInStockOnly,
+    priceRange,
+    selectedCategories,
+    selectedSecondaryOptions: selectedSizes,
+    openPanels,
+    categoryCounts,
+    secondaryCounts: sizeCounts,
+    filteredProducts,
+    updatePriceValue,
+    toggleCategory,
+    toggleSecondaryOption: toggleSize,
+    togglePanel,
+  } = useCollectionFilters({
+    products: reelProducts,
+    categories: reelCategories,
+    secondaryOptions: reelSizes,
+    secondaryPanelKey: "sizes",
+    maxPrice: 150,
+    matchesSecondary: (product, value) => product.sizeOptions.includes(value),
   });
   const [quickAddProduct, setQuickAddProduct] = useState(null);
 
@@ -196,61 +214,6 @@ export function FishingReelsPage({ t, lang, addToCart }) {
   ]), [reelsCopy]);
 
   const activeSortLabel = sortOptions.find((option) => option.value === sortBy)?.label || reelsCopy.sortFeatured;
-
-  const categoryCounts = useMemo(
-    () => reelCategories.reduce((acc, item) => ({ ...acc, [item.value]: reelProducts.filter((product) => product.category === item.value).length }), {}),
-    []
-  );
-
-  const sizeCounts = useMemo(
-    () => reelSizes.reduce((acc, item) => ({ ...acc, [item.value]: reelProducts.filter((product) => product.sizeOptions.includes(String(item.value))).length }), {}),
-    []
-  );
-
-  const filteredProducts = useMemo(() => {
-    let nextProducts = reelProducts.filter((product) => {
-      if (inStockOnly && !product.inStock) return false;
-      if (product.amount < priceRange[0] || product.amount > priceRange[1]) return false;
-      if (selectedCategories.length && !selectedCategories.includes(product.category)) return false;
-      if (selectedSizes.length && !selectedSizes.some((size) => product.sizeOptions.includes(size))) return false;
-      return true;
-    });
-
-    if (sortBy === "best-selling") {
-      nextProducts = [...nextProducts].sort((a, b) => b.reviews - a.reviews);
-    } else if (sortBy === "price-low") {
-      nextProducts = [...nextProducts].sort((a, b) => a.amount - b.amount);
-    } else if (sortBy === "price-high") {
-      nextProducts = [...nextProducts].sort((a, b) => b.amount - a.amount);
-    }
-
-    return nextProducts;
-  }, [inStockOnly, priceRange, selectedCategories, selectedSizes, sortBy]);
-
-  const updatePriceValue = (index, nextValue) => {
-    const safeValue = Number.isFinite(nextValue) ? nextValue : 0;
-    if (index === 0) {
-      setPriceRange((current) => [Math.max(0, Math.min(safeValue, current[1])), current[1]]);
-      return;
-    }
-    setPriceRange((current) => [current[0], Math.min(150, Math.max(safeValue, current[0]))]);
-  };
-
-  const toggleCategory = (value) => {
-    setSelectedCategories((current) =>
-      current.includes(value) ? current.filter((item) => item !== value) : [...current, value]
-    );
-  };
-
-  const toggleSize = (value) => {
-    setSelectedSizes((current) =>
-      current.includes(value) ? current.filter((item) => item !== value) : [...current, value]
-    );
-  };
-
-  const togglePanel = (panel) => {
-    setOpenPanels((current) => ({ ...current, [panel]: !current[panel] }));
-  };
 
   const confirmQuickAdd = ({ hand, size }) => {
     const option = `${hand} / ${size}`;

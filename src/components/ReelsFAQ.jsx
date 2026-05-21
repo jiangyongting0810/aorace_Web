@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 
-export function ReelsFAQ({ title, intro, items }) {
+function ReelsFAQComponent({ title, intro, items = [] }) {
   const [openIndex, setOpenIndex] = useState(null);
 
   return (
@@ -39,3 +39,5 @@ export function ReelsFAQ({ title, intro, items }) {
     </section>
   );
 }
+
+export const ReelsFAQ = memo(ReelsFAQComponent);

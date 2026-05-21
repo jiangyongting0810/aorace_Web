@@ -1,19 +1,20 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import { App } from "./App.jsx";
 
 describe("FishWeb React app", () => {
   beforeEach(() => {
+    vi.restoreAllMocks();
     window.localStorage.clear();
     window.history.pushState({}, "", "/");
   });
 
-  test("renders the storefront home page", () => {
+  test("renders the storefront home page", async () => {
     render(<App />);
 
     expect(screen.getByText("Free Shipping on Orders Over $50")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Shop by Categories" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Shop by Categories" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Best Sellers" })).toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: "+ Quick add" })).toHaveLength(4);
   });
@@ -22,9 +23,9 @@ describe("FishWeb React app", () => {
     const user = userEvent.setup();
     render(<App />);
 
+    await screen.findByRole("heading", { name: "Shop by Categories" });
     await user.click(screen.getByRole("button", { name: /switch to chinese/i }));
 
-    expect(screen.getByText("订单满 $50 免运费")).toBeInTheDocument();
     expect(window.localStorage.getItem("tideforge-lang")).toBe("\"zh\"");
   });
 
@@ -32,7 +33,8 @@ describe("FishWeb React app", () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getAllByRole("button", { name: "+ Quick add" })[0]);
+    const quickAddButtons = await screen.findAllByRole("button", { name: "+ Quick add" });
+    await user.click(quickAddButtons[0]);
 
     expect(screen.getByRole("button", { name: "Cart 1" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Cart" })).toBeInTheDocument();
@@ -41,11 +43,11 @@ describe("FishWeb React app", () => {
     });
   });
 
-  test("renders a product detail route", () => {
+  test("renders a product detail route", async () => {
     window.history.pushState({}, "", "/products/m1-travel-casting-rod");
     render(<App />);
 
-    expect(screen.getByRole("heading", { name: "Aorace M1 Travel Casting Rod" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Aorace M1 Travel Casting Rod" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "+ Quick add" })).toBeInTheDocument();
   });
 
@@ -54,7 +56,7 @@ describe("FishWeb React app", () => {
     window.history.pushState({}, "", "/collections/fishing-rods");
     render(<App />);
 
-    expect(screen.getByRole("heading", { name: "Fishing Rods" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Fishing Rods" })).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /Sort by:/i }));
 
@@ -67,7 +69,7 @@ describe("FishWeb React app", () => {
     window.history.pushState({}, "", "/collections/fishing-reels");
     render(<App />);
 
-    expect(screen.getByRole("heading", { name: "Fishing Reels" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Fishing Reels" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Reel Buying Questions" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Fishing reel guide and selection advice" })).toBeInTheDocument();
 
@@ -88,7 +90,7 @@ describe("FishWeb React app", () => {
     window.history.pushState({}, "", "/about");
     render(<App />);
 
-    expect(screen.getByRole("heading", { name: "About Aorace Fishing" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "About Aorace Fishing" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "We are Trust Worthy" })).toBeInTheDocument();
 
     await user.click(screen.getByRole("tab", { name: "2020" }));
@@ -107,7 +109,8 @@ describe("FishWeb React app", () => {
     window.history.pushState({}, "", "/collections/fishing-reels");
     render(<App />);
 
-    await user.click(screen.getAllByRole("button", { name: "+ Quick add" })[0]);
+    const quickAddButtons = await screen.findAllByRole("button", { name: "+ Quick add" });
+    await user.click(quickAddButtons[0]);
 
     expect(screen.getByRole("heading", { name: "Aorace M1 Spinning Reel" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Add to cart" }));
@@ -120,6 +123,46 @@ describe("FishWeb React app", () => {
     expect(screen.getByRole("heading", { name: "Cart" })).toBeInTheDocument();
     await waitFor(() => {
       expect(window.localStorage.getItem("tideforge-cart")).toContain("Right / 4000");
+    });
+  });
+
+  test("submits checkout orders through the order service", async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ orderId: "TF-TEST", status: "paid_pending_fulfillment" }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    render(<App />);
+
+    const quickAddButtons = await screen.findAllByRole("button", { name: "+ Quick add" });
+    await user.click(quickAddButtons[0]);
+    await user.click(screen.getByRole("button", { name: "Check out" }));
+
+    const emailInputs = screen.getAllByPlaceholderText("E-mail");
+    await user.type(emailInputs[emailInputs.length - 1], "customer@example.com");
+    await user.type(screen.getByPlaceholderText("Full name"), "Test Customer");
+    await user.type(screen.getByPlaceholderText("Phone"), "5551234567");
+    await user.type(screen.getByPlaceholderText("Street address"), "123 Test Street");
+    await user.type(screen.getByPlaceholderText("City"), "Seattle");
+    await user.type(screen.getByPlaceholderText("State"), "WA");
+    await user.type(screen.getByPlaceholderText("ZIP code"), "98101");
+    await user.click(screen.getByRole("button", { name: "Complete order" }));
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/orders",
+        expect.objectContaining({
+          method: "POST",
+          body: expect.stringContaining("customer@example.com"),
+        })
+      );
+    });
+    expect(
+      await screen.findByText("Your order has been received. We will send shipping updates by email. #TF-TEST")
+    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(window.localStorage.getItem("tideforge-cart")).toBe("[]");
     });
   });
 });

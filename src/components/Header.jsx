@@ -45,10 +45,9 @@ export function Header({
   setLang,
   setSearchOpen,
   setCartOpen,
-  mobileNavOpen,
-  setMobileNavOpen,
 }) {
   const [activeMegaMenuKey, setActiveMegaMenuKey] = useState(null);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [mobileOpenKey, setMobileOpenKey] = useState(null);
   const openTimer = useRef(null);
   const closeTimer = useRef(null);

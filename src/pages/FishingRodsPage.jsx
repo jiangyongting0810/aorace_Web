@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { assets, rodCategories, rodPieces, rodProducts } from "../data/content.js";
+import { useCollectionFilters } from "../features/collections/useCollectionFilters.js";
 import { formatMoney } from "../utils/format.js";
 
 function FilterCheckbox({ checked, label, count, onChange }) {
@@ -171,16 +172,33 @@ function RodCard({ product, rodsCopy, t, addToCart }) {
 
 export function FishingRodsPage({ t, lang, addToCart }) {
   const rodsCopy = t.rodsPage;
-  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
-  const [sortOpen, setSortOpen] = useState(false);
-  const [sortBy, setSortBy] = useState("featured");
-  const [inStockOnly, setInStockOnly] = useState(false);
-  const [priceRange, setPriceRange] = useState([0, 250]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedPieces, setSelectedPieces] = useState([]);
-  const [openPanels, setOpenPanels] = useState({
-    categories: true,
-    pieces: true,
+  const {
+    mobileFilterOpen,
+    setMobileFilterOpen,
+    sortOpen,
+    setSortOpen,
+    sortBy,
+    setSortBy,
+    inStockOnly,
+    setInStockOnly,
+    priceRange,
+    selectedCategories,
+    selectedSecondaryOptions: selectedPieces,
+    openPanels,
+    categoryCounts,
+    secondaryCounts: pieceCounts,
+    filteredProducts,
+    updatePriceValue,
+    toggleCategory,
+    toggleSecondaryOption: togglePiece,
+    togglePanel,
+  } = useCollectionFilters({
+    products: rodProducts,
+    categories: rodCategories,
+    secondaryOptions: rodPieces,
+    secondaryPanelKey: "pieces",
+    maxPrice: 250,
+    matchesSecondary: (product, value) => product.pieces === value,
   });
 
   const sortOptions = useMemo(() => ([
@@ -191,61 +209,6 @@ export function FishingRodsPage({ t, lang, addToCart }) {
   ]), [rodsCopy]);
 
   const activeSortLabel = sortOptions.find((option) => option.value === sortBy)?.label || rodsCopy.sortFeatured;
-
-  const categoryCounts = useMemo(
-    () => rodCategories.reduce((acc, item) => ({ ...acc, [item.value]: rodProducts.filter((product) => product.category === item.value).length }), {}),
-    []
-  );
-
-  const pieceCounts = useMemo(
-    () => rodPieces.reduce((acc, item) => ({ ...acc, [item.value]: rodProducts.filter((product) => product.pieces === item.value).length }), {}),
-    []
-  );
-
-  const filteredProducts = useMemo(() => {
-    let nextProducts = rodProducts.filter((product) => {
-      if (inStockOnly && !product.inStock) return false;
-      if (product.amount < priceRange[0] || product.amount > priceRange[1]) return false;
-      if (selectedCategories.length && !selectedCategories.includes(product.category)) return false;
-      if (selectedPieces.length && !selectedPieces.includes(product.pieces)) return false;
-      return true;
-    });
-
-    if (sortBy === "best-selling") {
-      nextProducts = [...nextProducts].sort((a, b) => b.reviews - a.reviews);
-    } else if (sortBy === "price-low") {
-      nextProducts = [...nextProducts].sort((a, b) => a.amount - b.amount);
-    } else if (sortBy === "price-high") {
-      nextProducts = [...nextProducts].sort((a, b) => b.amount - a.amount);
-    }
-
-    return nextProducts;
-  }, [inStockOnly, priceRange, selectedCategories, selectedPieces, sortBy]);
-
-  const updatePriceValue = (index, nextValue) => {
-    const safeValue = Number.isFinite(nextValue) ? nextValue : 0;
-    if (index === 0) {
-      setPriceRange((current) => [Math.max(0, Math.min(safeValue, current[1])), current[1]]);
-      return;
-    }
-    setPriceRange((current) => [current[0], Math.min(250, Math.max(safeValue, current[0]))]);
-  };
-
-  const toggleCategory = (value) => {
-    setSelectedCategories((current) =>
-      current.includes(value) ? current.filter((item) => item !== value) : [...current, value]
-    );
-  };
-
-  const togglePiece = (value) => {
-    setSelectedPieces((current) =>
-      current.includes(value) ? current.filter((item) => item !== value) : [...current, value]
-    );
-  };
-
-  const togglePanel = (panel) => {
-    setOpenPanels((current) => ({ ...current, [panel]: !current[panel] }));
-  };
 
   return (
     <main>

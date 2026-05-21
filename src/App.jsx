@@ -1,20 +1,22 @@
-import { useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { CartDrawer } from "./components/CartDrawer.jsx";
 import { CheckoutModal } from "./components/CheckoutModal.jsx";
 import { CookiePanel } from "./components/CookiePanel.jsx";
+import { ErrorBoundary } from "./components/ErrorBoundary.jsx";
 import { Footer } from "./components/Footer.jsx";
 import { Header } from "./components/Header.jsx";
 import { AppRouter } from "./router.jsx";
 import { SearchOverlay } from "./components/SearchOverlay.jsx";
-import { AboutUsPage } from "./pages/AboutUsPage.jsx";
-import { FishingRodsPage } from "./pages/FishingRodsPage.jsx";
-import { FishingReelsPage } from "./pages/FishingReelsPage.jsx";
-import { HomePage } from "./pages/HomePage.jsx";
-import { ProductDetailPage } from "./pages/ProductDetailPage.jsx";
-import { StoryDetailPage } from "./pages/StoryDetailPage.jsx";
 import { assets, copy } from "./data/content.js";
 import { useLocalStorageState } from "./hooks/useLocalStorageState.js";
+
+const HomePage = lazy(() => import("./pages/HomePage.jsx").then((module) => ({ default: module.HomePage })));
+const AboutUsPage = lazy(() => import("./pages/AboutUsPage.jsx").then((module) => ({ default: module.AboutUsPage })));
+const FishingRodsPage = lazy(() => import("./pages/FishingRodsPage.jsx").then((module) => ({ default: module.FishingRodsPage })));
+const FishingReelsPage = lazy(() => import("./pages/FishingReelsPage.jsx").then((module) => ({ default: module.FishingReelsPage })));
+const ProductDetailPage = lazy(() => import("./pages/ProductDetailPage.jsx").then((module) => ({ default: module.ProductDetailPage })));
+const StoryDetailPage = lazy(() => import("./pages/StoryDetailPage.jsx").then((module) => ({ default: module.StoryDetailPage })));
 
 function ScrollEffects() {
   const location = useLocation();
@@ -23,11 +25,20 @@ function ScrollEffects() {
     const header = document.querySelector(".site-header");
     const hero = document.querySelector(".hero, .rods-hero, .reels-hero, .about-hero");
     let enterFrame = 0;
+    let scrollFrame = 0;
 
     const updateHeaderState = () => {
       if (!header || !hero) return;
       const threshold = hero.offsetTop + hero.offsetHeight / 2;
       header.classList.toggle("is-pinned", window.scrollY >= threshold);
+    };
+
+    const scheduleHeaderStateUpdate = () => {
+      if (scrollFrame) return;
+      scrollFrame = window.requestAnimationFrame(() => {
+        scrollFrame = 0;
+        updateHeaderState();
+      });
     };
 
     updateHeaderState();
@@ -38,12 +49,13 @@ function ScrollEffects() {
       });
     }
 
-    window.addEventListener("scroll", updateHeaderState, { passive: true });
+    window.addEventListener("scroll", scheduleHeaderStateUpdate, { passive: true });
     window.addEventListener("resize", updateHeaderState);
 
     return () => {
       window.cancelAnimationFrame(enterFrame);
-      window.removeEventListener("scroll", updateHeaderState);
+      window.cancelAnimationFrame(scrollFrame);
+      window.removeEventListener("scroll", scheduleHeaderStateUpdate);
       window.removeEventListener("resize", updateHeaderState);
     };
   }, [location.pathname]);
@@ -84,8 +96,6 @@ function AppShell() {
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [orderResult, setOrderResult] = useState(null);
   const t = copy[lang] || copy.en;
   const otherLang = lang === "en" ? "zh" : "en";
 
@@ -188,18 +198,18 @@ function AppShell() {
         setLang={setLang}
         setSearchOpen={setSearchOpen}
         setCartOpen={setCartOpen}
-        mobileNavOpen={mobileNavOpen}
-        setMobileNavOpen={setMobileNavOpen}
       />
-      <Routes>
-        <Route path="/" element={<HomePage t={t} lang={lang} addToCart={addToCart} />} />
-        <Route path="/about" element={<AboutUsPage t={t} />} />
-        <Route path="/collections/fishing-rods" element={<FishingRodsPage t={t} lang={lang} addToCart={addToCart} />} />
-        <Route path="/collections/fishing-reels" element={<FishingReelsPage t={t} lang={lang} addToCart={addToCart} />} />
-        <Route path="/products/:productId" element={<ProductDetailPage t={t} addToCart={addToCart} />} />
-        <Route path="/stories/:slug" element={<StoryDetailPage t={t} lang={lang} />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <Suspense fallback={<main className="detail-page" aria-live="polite">{t.loading || "Loading..."}</main>}>
+        <Routes>
+          <Route path="/" element={<HomePage t={t} lang={lang} addToCart={addToCart} />} />
+          <Route path="/about" element={<AboutUsPage t={t} />} />
+          <Route path="/collections/fishing-rods" element={<FishingRodsPage t={t} lang={lang} addToCart={addToCart} />} />
+          <Route path="/collections/fishing-reels" element={<FishingReelsPage t={t} lang={lang} addToCart={addToCart} />} />
+          <Route path="/products/:productId" element={<ProductDetailPage t={t} addToCart={addToCart} />} />
+          <Route path="/stories/:slug" element={<StoryDetailPage t={t} lang={lang} />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
       <Footer t={t} navItems={navItems} />
       <CartDrawer
         t={t}
@@ -219,8 +229,6 @@ function AppShell() {
         checkoutOpen={checkoutOpen}
         setCheckoutOpen={setCheckoutOpen}
         setCartOpen={setCartOpen}
-        orderResult={orderResult}
-        setOrderResult={setOrderResult}
         setCartItems={setCartItems}
       />
       <SearchOverlay t={t} lang={lang} searchOpen={searchOpen} setSearchOpen={setSearchOpen} />
@@ -232,7 +240,9 @@ function AppShell() {
 export function App() {
   return (
     <AppRouter>
-      <AppShell />
+      <ErrorBoundary>
+        <AppShell />
+      </ErrorBoundary>
     </AppRouter>
   );
 }
