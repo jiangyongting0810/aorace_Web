@@ -22,12 +22,13 @@ function ScrollEffects() {
   const location = useLocation();
 
   useLayoutEffect(() => {
-    const header = document.querySelector(".site-header");
-    const hero = document.querySelector(".hero, .rods-hero, .reels-hero, .about-hero");
     let enterFrame = 0;
     let scrollFrame = 0;
+    let retryFrame = 0;
 
     const updateHeaderState = () => {
+      const header = document.querySelector(".site-header");
+      const hero = document.querySelector(".hero, .rods-hero, .reels-hero, .about-hero");
       if (!header || !hero) return;
       const threshold = hero.offsetTop + hero.offsetHeight / 2;
       header.classList.toggle("is-pinned", window.scrollY >= threshold);
@@ -41,7 +42,9 @@ function ScrollEffects() {
       });
     };
 
-    updateHeaderState();
+    scheduleHeaderStateUpdate();
+    retryFrame = window.requestAnimationFrame(scheduleHeaderStateUpdate);
+    const header = document.querySelector(".site-header");
     if (header) {
       header.classList.remove("is-entered");
       enterFrame = window.requestAnimationFrame(() => {
@@ -50,13 +53,14 @@ function ScrollEffects() {
     }
 
     window.addEventListener("scroll", scheduleHeaderStateUpdate, { passive: true });
-    window.addEventListener("resize", updateHeaderState);
+    window.addEventListener("resize", scheduleHeaderStateUpdate);
 
     return () => {
       window.cancelAnimationFrame(enterFrame);
       window.cancelAnimationFrame(scrollFrame);
+      window.cancelAnimationFrame(retryFrame);
       window.removeEventListener("scroll", scheduleHeaderStateUpdate);
-      window.removeEventListener("resize", updateHeaderState);
+      window.removeEventListener("resize", scheduleHeaderStateUpdate);
     };
   }, [location.pathname]);
 

@@ -76,6 +76,7 @@ npm run test
 ## 当前实现状态
 
 - 页面路由已经使用 `React.lazy()` 和 `Suspense` 做页面级懒加载。
+- Header 吸顶滚动逻辑会在滚动/resize 时重新查找当前页面 hero，并在 lazy 页面首屏渲染后补一次 RAF 检查，避免首次进入页面向下滚动时 header 不跟随。
 - 应用根部已经包裹 `ErrorBoundary`，避免单个组件异常直接导致整页白屏。
 - Header 的移动端菜单状态保留在 `Header.jsx` 内部，避免污染根组件状态。
 - 结账成功结果状态保留在 `CheckoutModal.jsx` 内部。
