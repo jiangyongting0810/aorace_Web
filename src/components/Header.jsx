@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { assets } from "../data/content.js";
 
 function SmartLink({ href, className, onClick, children }) {
@@ -13,25 +13,27 @@ function SmartLink({ href, className, onClick, children }) {
 function MegaMenuPanel({ menu, closeMegaMenu }) {
   return (
     <div className="mega-menu-panel">
-      <div className="mega-menu-copy">
-        <SmartLink href={menu.headingHref} className="mega-menu-heading" onClick={closeMegaMenu}>
-          {menu.heading}
+      <div className="mega-menu-panel-inner">
+        <div className="mega-menu-copy">
+          <SmartLink href={menu.headingHref} className="mega-menu-heading" onClick={closeMegaMenu}>
+            {menu.heading}
+          </SmartLink>
+          <div className="mega-menu-links">
+            {menu.links.map((link) => (
+              <SmartLink href={link.href} className="mega-menu-link" key={link.key} onClick={closeMegaMenu}>
+                {link.label}
+              </SmartLink>
+            ))}
+          </div>
+        </div>
+        <SmartLink href={menu.feature.href} className="mega-menu-media" onClick={closeMegaMenu}>
+          <img src={menu.feature.image || assets.categoryRods} alt={menu.feature.alt} />
+          <div className="mega-menu-media-copy">
+            <span>{menu.feature.eyebrow}</span>
+            <strong>{menu.feature.title}</strong>
+          </div>
         </SmartLink>
-        <div className="mega-menu-links">
-          {menu.links.map((link) => (
-            <SmartLink href={link.href} className="mega-menu-link" key={link.key} onClick={closeMegaMenu}>
-              {link.label}
-            </SmartLink>
-          ))}
-        </div>
       </div>
-      <SmartLink href={menu.feature.href} className="mega-menu-media" onClick={closeMegaMenu}>
-        <img src={menu.feature.image || assets.categoryRods} alt={menu.feature.alt} />
-        <div className="mega-menu-media-copy">
-          <span>{menu.feature.eyebrow}</span>
-          <strong>{menu.feature.title}</strong>
-        </div>
-      </SmartLink>
     </div>
   );
 }
@@ -46,6 +48,7 @@ export function Header({
   setSearchOpen,
   setCartOpen,
 }) {
+  const location = useLocation();
   const [activeMegaMenuKey, setActiveMegaMenuKey] = useState(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [mobileOpenKey, setMobileOpenKey] = useState(null);
@@ -91,9 +94,13 @@ export function Header({
     setMobileNavOpen(true);
   };
 
+  useEffect(() => {
+    closeMegaMenuImmediately();
+  }, [location.pathname]);
+
   return (
     <>
-      <header className="site-header">
+      <header className="site-header" data-mega-open={activeMegaMenuKey ? "true" : undefined}>
         <div className="site-header-inner">
           <button className="mobile-menu" onClick={openMobileNav} aria-label="Open menu">☰</button>
           <Link className="brand" to="/" aria-label={t.brand}>

@@ -1,5 +1,13 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { assets, blogs, categories, products, reviews } from "../data/content.js";
+
+function getProductPageSize() {
+  if (typeof window === "undefined") return 4;
+  if (window.innerWidth <= 720) return 1;
+  if (window.innerWidth <= 1100) return 2;
+  return 4;
+}
 
 function Hero() {
   return (
@@ -12,7 +20,13 @@ function Hero() {
 function CategorySection({ t, lang }) {
   return (
     <section className="categories section">
-      <h2>{t.categoriesTitle}</h2>
+      <div className="section-title-row category-title-row">
+        <h2>{t.categoriesTitle}</h2>
+        <Link to="/?scroll=best-sellers" className="view-all-link">
+          <span>{t.heroCta}</span>
+          <span aria-hidden="true">›</span>
+        </Link>
+      </div>
       <div className="category-grid">
         {categories.slice(0, 3).map((category) => (
           <Link to={category.href || "/?scroll=best-sellers"} className="category-card" key={category.en}>
@@ -31,7 +45,34 @@ function CategorySection({ t, lang }) {
 }
 
 function ProductSection({ t, addToCart }) {
-  const featuredProducts = products.slice(0, 4);
+  const [pageSize, setPageSize] = useState(getProductPageSize);
+  const [pageIndex, setPageIndex] = useState(0);
+  const colorLabel = (count) => {
+    if (!count) return "\u00a0";
+    return count === 1 ? `${count} color available` : `${count} ${t.colors}`;
+  };
+  const pageCount = Math.max(1, Math.ceil(products.length / pageSize));
+  const startIndex = pageIndex * pageSize;
+  const featuredProducts = products.slice(startIndex, startIndex + pageSize);
+  const progressWidth = `${((pageIndex + 1) / pageCount) * 100}%`;
+
+  useEffect(() => {
+    const updatePageSize = () => {
+      setPageSize((current) => {
+        const next = getProductPageSize();
+        return current === next ? current : next;
+      });
+    };
+
+    window.addEventListener("resize", updatePageSize);
+    return () => {
+      window.removeEventListener("resize", updatePageSize);
+    };
+  }, []);
+
+  useEffect(() => {
+    setPageIndex((current) => Math.min(current, pageCount - 1));
+  }, [pageCount]);
 
   return (
     <section className="section products" id="best-sellers">
@@ -55,7 +96,7 @@ function ProductSection({ t, addToCart }) {
                 {`${t.from} ${product.price}`}
                 {product.oldPrice && <span>{product.oldPrice}</span>}
               </p>
-              {product.colors === 1 && <small>{`${product.colors} color available`}</small>}
+              <small>{colorLabel(product.colors)}</small>
               <div className="rating-line" aria-label={`${product.rating} rating`}>
                 <span className="stars" aria-hidden="true">★★★★★</span>
                 <span>{`${product.rating} (${product.reviews} reviews)`}</span>
@@ -65,11 +106,25 @@ function ProductSection({ t, addToCart }) {
           </article>
         ))}
       </div>
-      <div className="product-slider-controls" aria-hidden="true">
-        <span className="product-progress" />
+      <div className="product-slider-controls">
+        <span className="product-progress" style={{ "--product-progress-width": progressWidth }} />
         <div>
-          <button>‹</button>
-          <button>›</button>
+          <button
+            type="button"
+            aria-label="Show previous products"
+            disabled={pageIndex === 0}
+            onClick={() => setPageIndex((current) => Math.max(0, current - 1))}
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            aria-label="Show next products"
+            disabled={pageIndex >= pageCount - 1}
+            onClick={() => setPageIndex((current) => Math.min(pageCount - 1, current + 1))}
+          >
+            ›
+          </button>
         </div>
       </div>
     </section>

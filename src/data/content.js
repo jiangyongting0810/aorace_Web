@@ -1,4 +1,4 @@
-import aoraceLogo from "../assets/aorace.svg";
+import aoraceLogo from "../assets/aorace-01.svg";
 import heroBanner from "../assets/hero-banner.png";
 import categoryRods from "../assets/category-rods.jpg";
 import categoryReels from "../assets/category-reels.webp";

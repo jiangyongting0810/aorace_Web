@@ -25,11 +25,20 @@ function ScrollEffects() {
     let enterFrame = 0;
     let scrollFrame = 0;
     let retryFrame = 0;
+    const forcePinnedHeader = location.pathname.startsWith("/collections/");
 
     const updateHeaderState = () => {
       const header = document.querySelector(".site-header");
+      if (!header) return;
+      if (forcePinnedHeader) {
+        header.classList.add("is-pinned");
+        return;
+      }
       const hero = document.querySelector(".hero, .rods-hero, .reels-hero, .about-hero");
-      if (!header || !hero) return;
+      if (!hero) {
+        header.classList.remove("is-pinned");
+        return;
+      }
       const threshold = hero.offsetTop + hero.offsetHeight / 2;
       header.classList.toggle("is-pinned", window.scrollY >= threshold);
     };

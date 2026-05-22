@@ -8,6 +8,7 @@ describe("FishWeb React app", () => {
     vi.restoreAllMocks();
     window.localStorage.clear();
     window.history.pushState({}, "", "/");
+    Object.defineProperty(window, "innerWidth", { value: 1440, configurable: true, writable: true });
   });
 
   test("renders the storefront home page", async () => {
@@ -41,6 +42,24 @@ describe("FishWeb React app", () => {
     await waitFor(() => {
       expect(window.localStorage.getItem("tideforge-cart")).toContain("m1-spinning-reel");
     });
+  });
+
+  test("switches best seller cards with the slider controls", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    expect(await screen.findByText("Aorace M1 Spinning Reel")).toBeInTheDocument();
+    expect(screen.queryByText("TideForge Estuary Baitcaster")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Show next products" }));
+
+    expect(await screen.findByText("TideForge Estuary Baitcaster")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Show previous products" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Show next products" })).toBeDisabled();
+
+    await user.click(screen.getByRole("button", { name: "Show previous products" }));
+
+    expect(await screen.findByText("Aorace M1 Spinning Reel")).toBeInTheDocument();
   });
 
   test("renders a product detail route", async () => {
